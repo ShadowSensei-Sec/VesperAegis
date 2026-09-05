@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 import yaml
+from app.firewall.network_validator import NetworkValidator
 
 
 @dataclass
@@ -21,6 +22,19 @@ class FirewallRule:
     priority: int = 100
 
     def validate(self) -> None:
+        # ================================
+        # NETWORK VALIDATION
+        # ================================
+
+        NetworkValidator.validate_network(
+            self.source_ip,
+            "Source IP"
+        )
+
+        NetworkValidator.validate_network(
+            self.destination_ip,
+            "Destination IP"
+        )
 
         # ================================
         # ACTION VALIDATION
@@ -85,6 +99,38 @@ class FirewallRule:
                     raise ValueError(
                         f"{port_name} must be between 1 and 65535."
                     )
+            # ================================
+        # INTERFACE VALIDATION
+        # ================================
+
+        if self.interface is not None:
+
+            if not isinstance(self.interface, str):
+                raise ValueError(
+                    "Interface must be a string."
+                )
+
+            if not self.interface.strip():
+                raise ValueError(
+                    "Interface cannot be empty."
+                )
+
+        # ================================
+        # DIRECTION VALIDATION
+        # ================================
+
+        if self.direction is not None:
+
+            allowed_directions = {
+                "in",
+                "out",
+                "forward"
+            }
+
+            if self.direction.lower() not in allowed_directions:
+                raise ValueError(
+                    "Direction must be in, out, or forward."
+                )
 
 
 class RuleParser:

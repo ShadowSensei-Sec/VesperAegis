@@ -1,13 +1,22 @@
 class RuleEngine:
 
     def __init__(self, rules=None):
-        self.rules = rules or []
+        self.rules = []
+        self.set_rules(rules or [])
 
     def set_rules(self, rules):
-        self.rules = rules
+        # Firewall evaluation uses priority.
+        # Lower priority number = evaluated first.
+        self.rules = sorted(
+            rules,
+            key=lambda rule: rule.get("priority", 100)
+        )
 
     def match_packet(self, metadata):
         for rule in self.rules:
+
+            if not rule.get("enabled", True):
+                continue
 
             if not self._matches(rule, metadata):
                 continue
@@ -27,8 +36,11 @@ class RuleEngine:
                 return False
 
         if rule.get("protocol"):
-            if rule["protocol"].lower() != metadata["protocol"].lower():
-                return False
+            protocol = rule["protocol"].lower()
+
+            if protocol != "any":
+                if protocol != metadata["protocol"].lower():
+                    return False
 
         if rule.get("source_port"):
             if rule["source_port"] != metadata["source_port"]:

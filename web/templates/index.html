@@ -102,9 +102,30 @@
 
             </div>
 
-
         </section>
 
+        <section class="cards">
+
+            <div class="card">
+                <h3>Accepted</h3>
+                <p id="accepted-count">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Dropped</h3>
+                <p id="dropped-count">0</p>
+            </div>
+
+            <div class="card">
+                <h3>TCP Packets</h3>
+                 <p id="tcp-count">0</p>
+            </div>
+
+            <div class="card">
+                <h3>UDP Packets</h3>
+                <p id="udp-count">0</p>
+            </div>
+        </section>
 
 
         <!-- ================================= -->
@@ -165,7 +186,167 @@
 
         </section>
 
+<!-- ================================= -->
+<!-- TRAFFIC ANALYTICS -->
+<!-- ================================= -->
 
+<section class="panel">
+
+    <h2>Traffic Analytics</h2>
+
+    <h3>Protocol Statistics</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Protocol</th>
+                <th>Packets</th>
+                <th>Bytes</th>
+            </tr>
+        </thead>
+
+        <tbody id="protocol-table">
+            <tr>
+                <td colspan="3">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <h3>Top Source IPs</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Source IP</th>
+                <th>Packets</th>
+                <th>Bytes</th>
+            </tr>
+        </thead>
+
+        <tbody id="source-ip-table">
+            <tr>
+                <td colspan="3">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <h3>Top Destination IPs</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Destination IP</th>
+                <th>Packets</th>
+                <th>Bytes</th>
+            </tr>
+        </thead>
+
+        <tbody id="destination-ip-table">
+            <tr>
+                <td colspan="3">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <h3>Top Source Ports</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Source Port</th>
+                <th>Packets</th>
+                <th>Bytes</th>
+            </tr>
+        </thead>
+
+        <tbody id="source-port-table">
+            <tr>
+                <td colspan="3">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <h3>Top Destination Ports</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Destination Port</th>
+                <th>Packets</th>
+                <th>Bytes</th>
+            </tr>
+        </thead>
+
+        <tbody id="destination-port-table">
+            <tr>
+                <td colspan="3">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+
+</section>
+<h3>Rule Analytics</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Rule</th>
+            <th>Action</th>
+            <th>Packets</th>
+            <th>Bytes</th>
+        </tr>
+    </thead>
+
+    <tbody id="rule-statistics-table">
+        <tr>
+            <td colspan="4">Loading...</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<h3>Zero-Hit Rules</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Rule</th>
+            <th>Action</th>
+            <th>Packets</th>
+            <th>Bytes</th>
+        </tr>
+    </thead>
+
+    <tbody id="zero-hit-rule-table">
+        <tr>
+            <td colspan="4">Loading...</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Traffic by Hour</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Hour</th>
+            <th>Packets</th>
+            <th>Bytes</th>
+            <th>Allowed</th>
+            <th>Dropped</th>
+        </tr>
+    </thead>
+
+    <tbody id="time-statistics-table">
+        <tr>
+            <td colspan="5">Loading...</td>
+        </tr>
+    </tbody>
+</table>
 
         <!-- ================================= -->
         <!-- ADD FIREWALL RULE -->

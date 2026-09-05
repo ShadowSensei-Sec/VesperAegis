@@ -38,3 +38,7 @@ Thumbs.db
 
 # Firewall runtime files
 runtime/
+
+# SQLite runtime files
+*.db-wal
+*.db-shm

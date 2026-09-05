@@ -106,7 +106,7 @@ def get_firewall_rules():
         """
         SELECT *
         FROM firewall_rules
-        ORDER BY priority ASC, id ASC
+        ORDER BY id ASC
         """
     ).fetchall()
 
@@ -200,6 +200,7 @@ def set_firewall_rule_enabled(rule_id, enabled):
 
     connection.commit()
     connection.close()
+
 def update_firewall_rule(
     rule_id,
     name,

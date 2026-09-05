@@ -1,4 +1,5 @@
 import subprocess
+from app.database.database import get_firewall_rules
 
 
 class NftablesManager:
@@ -305,11 +306,10 @@ class NftablesManager:
     # =========================================================
     # ADD RULE
     # =========================================================
-
     def add_rule(self, rule, chain: str = "forward") -> int | None:
         """
-        Add a FirewallRule to nftables and return the
-        newly-created nftables rule handle.
+        Add a FirewallRule to nftables according to priority
+        and return the newly-created nftables rule handle.
         """
 
         if not rule.enabled:
@@ -322,7 +322,7 @@ class NftablesManager:
                 f"Rule {rule.id} generated an empty nftables expression."
             )
 
-        # Get existing rule handles before adding the new rule
+        # Get existing rules before adding the new rule
         before_rules = self.get_forward_rule_details()
 
         before_handles = {
@@ -331,19 +331,78 @@ class NftablesManager:
             if item.get("handle") is not None
         }
 
-        command = [
-            "nft",
-            "add",
-            "rule",
-            self.TABLE_FAMILY,
-            self.TABLE_NAME,
-            chain,
-            *expression,
-        ]
+        database_rules = get_firewall_rules()
+
+        # -------------------------------------------------
+        # Determine insertion position using priority
+        # -------------------------------------------------
+
+        insert_handle = None
+
+        for existing_rule in before_rules:
+
+            existing_handle = existing_rule.get("handle")
+
+            if existing_handle is None:
+                continue
+
+            database_rule = next(
+                (
+                    item
+                    for item in database_rules
+                    if item.get("nft_handle") == existing_handle
+                ),
+                None
+            )
+
+            if database_rule is None:
+                continue
+
+            existing_priority = database_rule.get(
+                "priority",
+                100
+            )
+
+            if existing_priority > rule.priority:
+                insert_handle = existing_handle
+                break
+
+        # -------------------------------------------------
+        # Build nftables command
+        # -------------------------------------------------
+
+        if insert_handle is not None:
+
+            command = [
+                "nft",
+                "insert",
+                "rule",
+                self.TABLE_FAMILY,
+                self.TABLE_NAME,
+                chain,
+                "position",
+                str(insert_handle),
+                *expression,
+            ]
+
+        else:
+
+            command = [
+                "nft",
+                "add",
+                "rule",
+                self.TABLE_FAMILY,
+                self.TABLE_NAME,
+                chain,
+                *expression,
+            ]
 
         self._run(command, sudo=True)
 
-        # Get rule handles after adding the new rule
+        # -------------------------------------------------
+        # Detect newly-created handle
+        # -------------------------------------------------
+
         after_rules = self.get_forward_rule_details()
 
         after_handles = {
@@ -352,7 +411,6 @@ class NftablesManager:
             if item.get("handle") is not None
         }
 
-        # The new handle is the handle that did not exist before
         new_handles = after_handles - before_handles
 
         if not new_handles:
@@ -367,6 +425,7 @@ class NftablesManager:
             )
 
         return new_handles.pop()
+
 
     # =========================================================
     # DELETE RULE

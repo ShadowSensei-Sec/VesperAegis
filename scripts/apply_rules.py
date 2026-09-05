@@ -52,7 +52,10 @@ def bootstrap_database_from_yaml():
 def restore_database_rules(firewall):
     print("\n[+] Restoring rules from SQLite...")
 
-    rules = get_firewall_rules()
+    rules = sorted(
+        get_firewall_rules(),
+        key=lambda rule: rule.get("priority", 100)
+    )
 
     restored = 0
 
@@ -140,7 +143,7 @@ def main():
 
     # Allow traffic belonging to already-established connections
     firewall.add_stateful_forward_rules()
-    
+
     # ---------------------------------------------------------
     # 5. Configure NAT
     # ---------------------------------------------------------

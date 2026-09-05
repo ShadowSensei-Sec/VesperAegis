@@ -577,16 +577,389 @@ async function loadDashboard() {
             await statsResponse.json();
 
 
+        // ========================================================
+        // SUMMARY CARDS
+        // ========================================================
+
         document
             .getElementById("packet-count")
             .textContent =
-            stats.packets ?? 0;
+            stats.total_packets ?? 0;
 
 
         document
             .getElementById("byte-count")
             .textContent =
-            stats.bytes ?? 0;
+            stats.total_bytes ?? 0;
+
+
+        document
+            .getElementById("accepted-count")
+            .textContent =
+            stats.accepted_packets ?? 0;
+
+
+        document
+            .getElementById("dropped-count")
+            .textContent =
+            stats.dropped_packets ?? 0;
+
+
+        document
+            .getElementById("tcp-count")
+            .textContent =
+            stats.protocols?.tcp?.packets ?? 0;
+
+
+        document
+            .getElementById("udp-count")
+            .textContent =
+            stats.protocols?.udp?.packets ?? 0;
+
+
+        // ========================================================
+        // PROTOCOL ANALYTICS
+        // ========================================================
+
+        const protocolTable =
+            document.getElementById("protocol-table");
+
+
+        if (protocolTable) {
+
+            protocolTable.innerHTML = "";
+
+
+            Object.entries(
+                stats.protocols || {}
+            )
+                .sort(
+                    (a, b) =>
+                        b[1].packets -
+                        a[1].packets
+                )
+                .forEach(
+                    ([protocol, data]) => {
+
+                        const row =
+                            document.createElement("tr");
+
+
+                        row.innerHTML = `
+                            <td>${protocol}</td>
+                            <td>${data.packets}</td>
+                            <td>${data.bytes}</td>
+                        `;
+
+
+                        protocolTable.appendChild(row);
+                    }
+                );
+        }
+
+
+        // ========================================================
+        // SOURCE IP ANALYTICS
+        // ========================================================
+
+        const sourceIpTable =
+            document.getElementById(
+                "source-ip-table"
+            );
+
+
+        if (sourceIpTable) {
+
+            sourceIpTable.innerHTML = "";
+
+
+            Object.entries(
+                stats.ips?.source_ips || {}
+            )
+                .sort(
+                    (a, b) =>
+                        b[1].packets -
+                        a[1].packets
+                )
+                .slice(0, 10)
+                .forEach(
+                    ([ip, data]) => {
+
+                        const row =
+                            document.createElement("tr");
+
+
+                        row.innerHTML = `
+                            <td>${ip}</td>
+                            <td>${data.packets}</td>
+                            <td>${data.bytes}</td>
+                        `;
+
+
+                        sourceIpTable.appendChild(row);
+                    }
+                );
+        }
+
+
+        // ========================================================
+        // DESTINATION IP ANALYTICS
+        // ========================================================
+
+        const destinationIpTable =
+            document.getElementById(
+                "destination-ip-table"
+            );
+
+
+        if (destinationIpTable) {
+
+            destinationIpTable.innerHTML = "";
+
+
+            Object.entries(
+                stats.ips?.destination_ips || {}
+            )
+                .sort(
+                    (a, b) =>
+                        b[1].packets -
+                        a[1].packets
+                )
+                .slice(0, 10)
+                .forEach(
+                    ([ip, data]) => {
+
+                        const row =
+                            document.createElement("tr");
+
+
+                        row.innerHTML = `
+                            <td>${ip}</td>
+                            <td>${data.packets}</td>
+                            <td>${data.bytes}</td>
+                        `;
+
+
+                        destinationIpTable.appendChild(row);
+                    }
+                );
+        }
+
+
+        // ========================================================
+        // SOURCE PORT ANALYTICS
+        // ========================================================
+
+        const sourcePortTable =
+            document.getElementById(
+                "source-port-table"
+            );
+
+
+        if (sourcePortTable) {
+
+            sourcePortTable.innerHTML = "";
+
+
+            Object.entries(
+                stats.ports?.source_ports || {}
+            )
+                .sort(
+                    (a, b) =>
+                        b[1].packets -
+                        a[1].packets
+                )
+                .slice(0, 10)
+                .forEach(
+                    ([port, data]) => {
+
+                        const row =
+                            document.createElement("tr");
+
+
+                        row.innerHTML = `
+                            <td>${port}</td>
+                            <td>${data.packets}</td>
+                            <td>${data.bytes}</td>
+                        `;
+
+
+                        sourcePortTable.appendChild(row);
+                    }
+                );
+        }
+
+
+        // ========================================================
+        // DESTINATION PORT ANALYTICS
+        // ========================================================
+
+        const destinationPortTable =
+            document.getElementById(
+                "destination-port-table"
+            );
+
+
+        if (destinationPortTable) {
+
+            destinationPortTable.innerHTML = "";
+
+
+            Object.entries(
+                stats.ports?.destination_ports || {}
+            )
+                .sort(
+                    (a, b) =>
+                        b[1].packets -
+                        a[1].packets
+                )
+                .slice(0, 10)
+                .forEach(
+                    ([port, data]) => {
+
+                        const row =
+                            document.createElement("tr");
+
+
+                        row.innerHTML = `
+                            <td>${port}</td>
+                            <td>${data.packets}</td>
+                            <td>${data.bytes}</td>
+                        `;
+
+
+                        destinationPortTable.appendChild(row);
+                    }
+                );
+        }
+
+
+        // ========================================================
+        // RULE ANALYTICS
+        // ========================================================
+
+        const ruleStatisticsTable =
+            document.getElementById(
+                "rule-statistics-table"
+            );
+
+
+        if (ruleStatisticsTable) {
+
+            ruleStatisticsTable.innerHTML = "";
+
+
+            (
+                stats
+                    .rule_statistics
+                    ?.most_used_rules ||
+                []
+            )
+                .forEach(
+                    rule => {
+
+                        const row =
+                            document.createElement("tr");
+
+
+                        row.innerHTML = `
+                            <td>${rule.rule}</td>
+                            <td>${rule.action}</td>
+                            <td>${rule.packets}</td>
+                            <td>${rule.bytes}</td>
+                        `;
+
+
+                        ruleStatisticsTable.appendChild(row);
+                    }
+                );
+        }
+
+
+        // ========================================================
+        // ZERO-HIT RULES
+        // ========================================================
+
+        const zeroHitRuleTable =
+            document.getElementById(
+                "zero-hit-rule-table"
+            );
+
+
+        if (zeroHitRuleTable) {
+
+            zeroHitRuleTable.innerHTML = "";
+
+
+            (
+                stats
+                    .rule_statistics
+                    ?.zero_hit_rules ||
+                []
+            )
+                .forEach(
+                    rule => {
+
+                        const row =
+                            document.createElement("tr");
+
+
+                        row.innerHTML = `
+                            <td>${rule.rule}</td>
+                            <td>${rule.action}</td>
+                            <td>${rule.packets}</td>
+                            <td>${rule.bytes}</td>
+                        `;
+
+
+                        zeroHitRuleTable.appendChild(row);
+                    }
+                );
+        }
+
+
+        // ========================================================
+        // TIME ANALYTICS
+        // ========================================================
+
+        const timeStatisticsTable =
+            document.getElementById(
+                "time-statistics-table"
+            );
+
+
+        if (timeStatisticsTable) {
+
+            timeStatisticsTable.innerHTML = "";
+
+
+            Object.entries(
+                stats.time_statistics || {}
+            )
+                .sort(
+                    (a, b) =>
+                        b[0].localeCompare(a[0])
+                )
+                .forEach(
+                    ([hour, data]) => {
+
+                        const row =
+                            document.createElement("tr");
+
+
+                        row.innerHTML = `
+                            <td>${hour}</td>
+                            <td>${data.packets}</td>
+                            <td>${data.bytes}</td>
+                            <td>${data.allowed_packets}</td>
+                            <td>${data.dropped_packets}</td>
+                        `;
+
+
+                        timeStatisticsTable.appendChild(row);
+                    }
+                );
+        }
 
 
     } catch (error) {
