@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Firewall Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/dashboard.css"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- ================================= -->
+    <!-- HEADER -->
+    <!-- ================================= -->
+
+    <header>
+
+        <h1>Firewall Dashboard</h1>
+
+        <span id="status">
+            Checking...
+        </span>
+
+    </header>
+
+
+    <!-- ================================= -->
+    <!-- MAIN DASHBOARD -->
+    <!-- ================================= -->
+
+    <main>
+
+
+        <!-- ================================= -->
+        <!-- DASHBOARD CARDS -->
+        <!-- ================================= -->
+
+        <section class="cards">
+
+
+            <div class="card">
+
+                <h3>
+                    Firewall
+                </h3>
+
+                <p id="firewall-status">
+                    Loading...
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Rules
+                </h3>
+
+                <p id="rule-count">
+                    Loading...
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Packets
+                </h3>
+
+                <p id="packet-count">
+                    Loading...
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Bytes
+                </h3>
+
+                <p id="byte-count">
+                    Loading...
+                </p>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- ================================= -->
+        <!-- FIREWALL RULES -->
+        <!-- ================================= -->
+
+        <section class="panel">
+
+            <h2>
+                Rules
+            </h2>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Name</th>
+
+                        <th>Action</th>
+
+                        <th>Protocol</th>
+
+                        <th>Source</th>
+
+                        <th>Destination</th>
+
+                        <th>Status</th>
+
+                        <th>Packet</th>
+
+                        <th>Byte</th>
+
+                        <th>Controls</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="rules-table">
+
+                    <tr>
+
+                        <td colspan="10">
+                            Loading...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+
+
+        <!-- ================================= -->
+        <!-- ADD FIREWALL RULE -->
+        <!-- ================================= -->
+
+        <section class="panel">
+
+            <h2>
+                Add Firewall Rule
+            </h2>
+
+
+            <form id="rule-form">
+
+
+                <!-- RULE NAME -->
+
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Rule name"
+                    required
+                >
+
+
+                <!-- ACTION -->
+
+                <select id="action">
+
+                    <option value="allow">
+                        Allow
+                    </option>
+
+                    <option value="deny">
+                        Deny
+                    </option>
+
+                </select>
+
+
+                <!-- PROTOCOL -->
+
+                <select id="protocol">
+
+                    <option value="">
+                        Any Protocol
+                    </option>
+
+                    <option value="tcp">
+                        TCP
+                    </option>
+
+                    <option value="udp">
+                        UDP
+                    </option>
+
+                    <option value="icmp">
+                        ICMP
+                    </option>
+
+                </select>
+
+
+                <!-- SOURCE IP -->
+
+                <input
+                    type="text"
+                    id="source_ip"
+                    placeholder="Source IP (optional)"
+                >
+
+
+                <!-- DESTINATION IP -->
+
+                <input
+                    type="text"
+                    id="destination_ip"
+                    placeholder="Destination IP (optional)"
+                >
+
+
+                <!-- SOURCE PORT -->
+
+                <input
+                    type="number"
+                    id="source_port"
+                    placeholder="Source Port (optional)"
+                >
+
+
+                <!-- DESTINATION PORT -->
+
+                <input
+                    type="number"
+                    id="destination_port"
+                    placeholder="Destination Port (optional)"
+                >
+
+
+                <!-- SUBMIT -->
+
+                <button type="submit">
+                    Add Rule
+                </button>
+
+
+            </form>
+
+
+            <!-- API RESULT MESSAGE -->
+
+            <p id="rule-message"></p>
+        <section
+    class="panel"
+    id="edit-rule-panel"
+    style="display: none;"
+>
+    <h2>Edit Firewall Rule</h2>
+
+    <form id="edit-rule-form">
+
+        <input
+            type="hidden"
+            id="edit-rule-id"
+        >
+
+        <input
+            type="text"
+            id="edit-name"
+            placeholder="Rule name"
+            required
+        >
+
+        <select id="edit-action">
+            <option value="allow">Allow</option>
+            <option value="deny">Deny</option>
+        </select>
+
+        <select id="edit-protocol">
+            <option value="any">Any Protocol</option>
+            <option value="tcp">TCP</option>
+            <option value="udp">UDP</option>
+            <option value="icmp">ICMP</option>
+        </select>
+
+        <input
+            type="text"
+            id="edit-source-ip"
+            placeholder="Source IP (optional)"
+        >
+
+        <input
+            type="text"
+            id="edit-destination-ip"
+            placeholder="Destination IP (optional)"
+        >
+
+        <input
+            type="number"
+            id="edit-source-port"
+            placeholder="Source Port (optional)"
+        >
+
+        <input
+            type="number"
+            id="edit-destination-port"
+            placeholder="Destination Port (optional)"
+        >
+
+        <label>
+            <input
+                type="checkbox"
+                id="edit-enabled"
+            >
+            Enabled
+        </label>
+
+        <button type="submit">
+            Save Changes
+        </button>
+
+        <button
+            type="button"
+            id="cancel-edit"
+        >
+            Cancel
+        </button>
+
+    </form>
+
+    <p id="edit-message"></p>
+</section>
+
+
+    </main>
+
+
+    <!-- ================================= -->
+    <!-- DASHBOARD JAVASCRIPT -->
+    <!-- ================================= -->
+
+    <script src="/static/js/dashboard.js"></script>
+
+
+</body>
+
+</html>
