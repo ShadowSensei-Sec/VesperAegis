@@ -34,3 +34,9 @@ CREATE TABLE IF NOT EXISTS firewall_rules (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS auth_credentials (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    username TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    must_change_password INTEGER NOT NULL DEFAULT 1
+);

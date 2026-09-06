@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Firewall Rules</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/rules.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app-shell">
+
+
+    <!-- =====================================================
+         TOP HEADER
+         ===================================================== -->
+
+    <header class="topbar">
+
+         <div class="brand">
+
+            <div class="brand-icon">
+                🦉
+            </div>
+
+            <div class="brand-text">
+
+                <h1>VesperAegis</h1>
+
+                <span>
+                    Adaptive Network Security & Traffic Intelligence
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="topbar-right">
+
+            <div class="firewall-status">
+
+                <span class="status-dot"></span>
+
+                Firewall Online
+
+            </div>
+
+
+            <input
+                class="global-search"
+                type="search"
+                placeholder="Search..."
+            >
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+<aside class="sidebar">
+
+    <nav class="sidebar-nav">
+
+        <a href="/" class="nav-item">
+            <span class="nav-icon">⌂</span>
+            <span class="nav-label">Dashboard</span>
+        </a>
+
+        <a href="/rules" class="nav-item">
+            <span class="nav-icon">☷</span>
+            <span class="nav-label">Rules</span>
+        </a>
+
+        <a href="/logs" class="nav-item">
+            <span class="nav-icon">▣</span>
+            <span class="nav-label">Logs</span>
+        </a>
+
+        <a href="/traffic" class="nav-item">
+            <span class="nav-icon">◫</span>
+            <span class="nav-label">Traffic</span>
+        </a>
+
+        <a href="/system" class="nav-item">
+            <span class="nav-icon">▦</span>
+            <span class="nav-label">System</span>
+        </a>
+
+        <a href="/ai" class="nav-item">
+            <span class="nav-icon">✦</span>
+            <span class="nav-label">AI Assistant</span>
+        </a>
+
+
+
+    </nav>
+
+    <div class="sidebar-footer">
+        <button
+            type="button"
+            id="logout-button"
+            class="nav-item logout-button"
+        >
+            <span class="nav-icon">↪</span>
+            <span class="nav-label">Logout</span>
+        </button>
+    </div>
+
+</aside>
+
+
+    <!-- =====================================================
+         RULES PAGE
+         ===================================================== -->
+
+    <main class="main-content">
+
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+
+    <div>
+        <h2 class="page-title">
+            Firewall Rules
+        </h2>
+
+        <p class="page-subtitle">
+            Manage and monitor your firewall policies
+        </p>
+    </div>
+
+    <button
+        id="add-rule-button"
+        class="primary-button"
+        type="button"
+    >
+        + Add Rule
+    </button>
+
+</section>
+
+
+
+        <!-- =================================================
+             SUMMARY CARDS
+             ================================================= -->
+
+        <section class="rules-summary">
+
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Total Rules
+                </span>
+
+                <strong id="total-rules">
+                    0
+                </strong>
+
+                <small>
+                    All configured rules
+                </small>
+
+            </div>
+
+
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Active Rules
+                </span>
+
+                <strong id="active-rules">
+                    0
+                </strong>
+
+                <small>
+                    Currently enabled
+                </small>
+
+            </div>
+
+
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Disabled Rules
+                </span>
+
+                <strong id="disabled-rules">
+                    0
+                </strong>
+
+                <small>
+                    Currently disabled
+                </small>
+
+            </div>
+
+
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Allow / Deny
+                </span>
+
+                <strong>
+
+                    <span
+                        id="allow-rules"
+                        class="allow-text"
+                    >
+                        0
+                    </span>
+
+                    /
+
+                    <span
+                        id="deny-rules"
+                        class="deny-text"
+                    >
+                        0
+                    </span>
+
+                </strong>
+
+                <small>
+                    Policy distribution
+                </small>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             RULE DISTRIBUTION
+             ================================================= -->
+
+        <section class="rule-charts">
+
+
+            <div class="panel chart-card">
+
+                <h3>
+                    Rule Distribution
+                </h3>
+
+                <p>
+                    Allow vs Deny policies
+                </p>
+
+
+                <div
+                    id="rule-donut"
+                    class="donut"
+                >
+
+                    <div class="donut-center">
+
+                        <strong id="rule-total-chart">
+                            0
+                        </strong>
+
+                        <span>
+                            Rules
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chart-legend">
+
+                    <div>
+
+                        <span class="legend-dot allow-dot"></span>
+
+                        Allow
+
+                        <strong id="allow-percentage">
+                            0%
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span class="legend-dot deny-dot"></span>
+
+                        Deny
+
+                        <strong id="deny-percentage">
+                            0%
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="panel chart-card">
+
+                <h3>
+                    Protocol Distribution
+                </h3>
+
+                <p>
+                    Protocols used in firewall rules
+                </p>
+
+
+                <div id="protocol-distribution">
+
+                    <!-- Filled by rules.js -->
+
+                </div>
+
+            </div>
+
+
+
+            <div class="panel chart-card">
+
+                <h3>
+                    Rule Status
+                </h3>
+
+                <p>
+                    Enabled vs Disabled
+                </p>
+
+
+                <div
+                    id="status-donut"
+                    class="donut status-donut"
+                >
+
+                    <div class="donut-center">
+
+                        <strong id="status-total-chart">
+                            0
+                        </strong>
+
+                        <span>
+                            Rules
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chart-legend">
+
+                    <div>
+
+                        <span class="legend-dot enabled-dot"></span>
+
+                        Enabled
+
+                        <strong id="enabled-percentage">
+                            0%
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span class="legend-dot disabled-dot"></span>
+
+                        Disabled
+
+                        <strong id="disabled-percentage">
+                            0%
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             FILTERS
+             ================================================= -->
+
+        <section class="rules-toolbar panel">
+
+
+            <input
+                id="rule-search"
+                type="search"
+                placeholder="Search rules by name, IP, port, or protocol..."
+            >
+
+
+            <select id="action-filter">
+
+                <option value="all">
+                    All Actions
+                </option>
+
+                <option value="allow">
+                    Allow
+                </option>
+
+                <option value="deny">
+                    Deny
+                </option>
+
+            </select>
+
+
+            <select id="protocol-filter">
+
+                <option value="all">
+                    All Protocols
+                </option>
+
+                <option value="tcp">
+                    TCP
+                </option>
+
+                <option value="udp">
+                    UDP
+                </option>
+
+                <option value="icmp">
+                    ICMP
+                </option>
+
+                <option value="icmpv6">
+                    ICMPv6
+                </option>
+
+                <option value="any">
+                    Any
+                </option>
+
+            </select>
+
+
+            <select id="status-filter">
+
+                <option value="all">
+                    All Statuses
+                </option>
+
+                <option value="enabled">
+                    Enabled
+                </option>
+
+                <option value="disabled">
+                    Disabled
+                </option>
+
+            </select>
+
+
+            <button
+                id="reset-filters"
+                class="btn btn-secondary"
+                type="button"
+            >
+                Reset
+            </button>
+
+        </section>
+
+
+
+        <!-- =================================================
+             RULE TABLE
+             ================================================= -->
+
+        <section class="panel rules-table-panel">
+
+
+            <div class="table-header">
+
+                <div>
+
+                    <h3>
+                        Firewall Rules
+                    </h3>
+
+                    <p>
+                        List of all configured firewall policies
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Priority
+                            </th>
+
+                            <th>
+                                Rule Name
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                            <th>
+                                Protocol
+                            </th>
+
+                            <th>
+                                Source
+                            </th>
+
+                            <th>
+                                Destination
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="rules-table-body">
+
+                        <!-- Rules populated by rules.js -->
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     ADD / EDIT FIREWALL RULE MODAL
+     ========================================================= -->
+
+<div
+    id="rule-modal"
+    class="rule-modal"
+    aria-hidden="true"
+>
+
+
+    <div
+        class="rule-modal-backdrop"
+        id="rule-modal-backdrop"
+    ></div>
+
+
+    <div
+        class="rule-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rule-modal-title"
+    >
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="rule-modal-header">
+
+            <div>
+
+                <h2 id="rule-modal-title">
+                    Add Firewall Rule
+                </h2>
+
+                <p id="rule-modal-description">
+                    Create a new firewall policy
+                </p>
+
+            </div>
+
+
+            <button
+                id="close-rule-modal"
+                class="modal-close"
+                type="button"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form id="rule-form">
+
+
+            <!-- Hidden ID used during edit -->
+
+            <input
+                type="hidden"
+                id="rule-id"
+            >
+
+
+
+            <!-- BASIC SETTINGS -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Basic Configuration
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <div class="form-group form-group-full">
+
+                        <label for="rule-name">
+                            Rule Name
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            id="rule-name"
+                            name="name"
+                            type="text"
+                            placeholder="Example: Block Telnet"
+                            maxlength="100"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="rule-action">
+                            Action
+                            <span class="required">*</span>
+                        </label>
+
+                        <select
+                            id="rule-action"
+                            name="action"
+                            required
+                        >
+
+                            <option value="allow">
+                                Allow
+                            </option>
+
+                            <option value="deny">
+                                Deny
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="rule-protocol">
+                            Protocol
+                            <span class="required">*</span>
+                        </label>
+
+                        <select
+                            id="rule-protocol"
+                            name="protocol"
+                            required
+                        >
+
+                            <option value="tcp">
+                                TCP
+                            </option>
+
+                            <option value="udp">
+                                UDP
+                            </option>
+
+                            <option value="icmp">
+                                ICMP
+                            </option>
+
+                            <option value="icmpv6">
+                                ICMPv6
+                            </option>
+
+                            <option value="any">
+                                Any
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- SOURCE -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Source
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label for="rule-source-ip">
+                            Source IP / Network
+                        </label>
+
+                        <input
+                            id="rule-source-ip"
+                            name="source_ip"
+                            type="text"
+                            placeholder="Any or 192.168.50.0/24"
+                        >
+
+                        <small>
+                            Leave empty to allow any source.
+                        </small>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="rule-source-port">
+                            Source Port
+                        </label>
+
+                        <input
+                            id="rule-source-port"
+                            name="source_port"
+                            type="number"
+                            min="1"
+                            max="65535"
+                            placeholder="Any"
+                        >
+
+                        <small>
+                            TCP/UDP only.
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DESTINATION -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Destination
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label for="rule-destination-ip">
+                            Destination IP / Network
+                        </label>
+
+                        <input
+                            id="rule-destination-ip"
+                            name="destination_ip"
+                            type="text"
+                            placeholder="Any or 192.168.60.20"
+                        >
+
+                        <small>
+                            Leave empty to allow any destination.
+                        </small>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="rule-destination-port">
+                            Destination Port
+                        </label>
+
+                        <input
+                            id="rule-destination-port"
+                            name="destination_port"
+                            type="number"
+                            min="1"
+                            max="65535"
+                            placeholder="Any"
+                        >
+
+                        <small>
+                            TCP/UDP only.
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ADVANCED -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Advanced Settings
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label for="rule-interface">
+                            Interface
+                        </label>
+
+                        <input
+                            id="rule-interface"
+                            name="interface"
+                            type="text"
+                            placeholder="Example: enp0s8"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="rule-direction">
+                            Direction
+                        </label>
+
+                        <select
+                            id="rule-direction"
+                            name="direction"
+                        >
+
+                            <option value="">
+                                Any
+                            </option>
+
+                            <option value="in">
+                                Inbound
+                            </option>
+
+                            <option value="out">
+                                Outbound
+                            </option>
+
+                            <option value="forward">
+                                Forward
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="rule-priority">
+                            Priority
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            id="rule-priority"
+                            name="priority"
+                            type="number"
+                            min="1"
+                            max="10000"
+                            value="100"
+                            required
+                        >
+
+                        <small>
+                            Lower number = higher priority.
+                        </small>
+
+                    </div>
+
+
+
+                    <div class="form-group form-toggle-group">
+
+                        <label>
+                            Rule Status
+                        </label>
+
+
+                        <label class="toggle-control">
+
+                            <input
+                                id="rule-enabled"
+                                name="enabled"
+                                type="checkbox"
+                                checked
+                            >
+
+                            <span class="toggle-slider"></span>
+
+                            <span class="toggle-label">
+                                Enabled
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+
+                    <div class="form-group form-group-full">
+
+                        <label for="rule-description">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="rule-description"
+                            name="description"
+                            rows="3"
+                            maxlength="500"
+                            placeholder="Describe the purpose of this firewall rule..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- FORM ERROR -->
+
+            <div
+                id="rule-form-error"
+                class="form-message error"
+                hidden
+            ></div>
+
+
+
+            <!-- MODAL FOOTER -->
+
+            <div class="rule-modal-footer">
+
+                <button
+                    id="cancel-rule-button"
+                    class="btn btn-secondary"
+                    type="button"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    id="save-rule-button"
+                    class="btn btn-primary"
+                    type="submit"
+                >
+                    Create Rule
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<link rel="stylesheet" href="/static/css/sidebar.css?v=1">
+<script src="/static/js/sidebar.js?v=2"></script>
+
+<script src="/static/js/rules.js"></script>
+
+  
+
+
+</body>
+
+</html>

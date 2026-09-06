@@ -1,0 +1,447 @@
+/* =========================================================
+   SYSTEM PAGE
+   ========================================================= */
+
+.system-page {
+    padding: 28px;
+}
+
+.system-page .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.system-page .page-header h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.system-page .page-header p {
+    margin: 7px 0 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   SUMMARY CARDS
+   ========================================================= */
+
+.system-page .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.system-page .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    min-height: 100px;
+}
+
+.system-page .stat-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.system-page .stat-icon {
+    color: var(--blue-bright);
+}
+
+.system-page .stat-value {
+    margin-top: 12px;
+    color: var(--text-primary);
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.system-page .stat-label {
+    margin-top: 5px;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   GENERAL GRID
+   ========================================================= */
+
+.system-page .content-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+
+.system-page .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 18px;
+}
+
+.system-page .content-grid .panel {
+    margin-bottom: 0;
+}
+
+.system-page .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.system-page .panel-header h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.system-page .panel-header p {
+    margin: 5px 0 0;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   RESOURCE USAGE
+   ========================================================= */
+
+.system-page .resource-list {
+    padding: 18px;
+}
+
+.system-page .resource-item {
+    margin-bottom: 20px;
+}
+
+.system-page .resource-item:last-child {
+    margin-bottom: 0;
+}
+
+.system-page .resource-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.system-page .resource-header strong {
+    color: var(--text-primary);
+}
+
+.system-page .progress-bar {
+    width: 100%;
+    height: 7px;
+    overflow: hidden;
+    background: #10283d;
+    border-radius: 10px;
+}
+
+.system-page .progress-fill {
+    height: 100%;
+    background: var(--blue);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+
+/* =========================================================
+   INFORMATION LIST
+   ========================================================= */
+
+.system-page .info-list {
+    padding: 4px 18px 10px;
+}
+
+.system-page .info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 39px;
+    border-bottom: 1px solid rgba(37, 68, 95, 0.55);
+    font-size: 12px;
+}
+
+.system-page .info-row:last-child {
+    border-bottom: none;
+}
+
+.system-page .info-row span {
+    color: var(--text-secondary);
+}
+
+.system-page .info-row strong {
+    color: var(--text-primary);
+    text-align: right;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   NETWORK TABLE
+   ========================================================= */
+
+.system-page .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.system-page .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+.system-page .data-table th {
+    padding: 12px 14px;
+    background: var(--panel-soft);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.system-page .data-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(37, 68, 95, 0.55);
+    color: var(--text-secondary);
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.system-page .data-table tbody tr:hover {
+    background: var(--panel-hover);
+}
+
+.system-page .data-table td strong {
+    color: var(--text-primary);
+}
+
+
+/* =========================================================
+   INTERFACE STATUS
+   ========================================================= */
+
+.system-page .interface-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+.system-page .interface-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+}
+
+.system-page .interface-status.up {
+    color: var(--green);
+}
+
+.system-page .interface-status.up::before {
+    background: var(--green);
+}
+
+.system-page .interface-status.down {
+    color: var(--red);
+}
+
+
+/* =========================================================
+   FIREWALL SERVICES
+   ========================================================= */
+
+.system-page .service-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    padding: 16px;
+}
+
+.system-page .service-card {
+    padding: 14px;
+    background: var(--panel-soft);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+}
+
+.system-page .service-name {
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.system-page .service-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.system-page .service-status .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+}
+
+.system-page .service-status.operational {
+    color: var(--green);
+}
+
+.system-page .service-status.operational .status-dot {
+    background: var(--green);
+}
+
+.system-page .service-status.error {
+    color: var(--red);
+}
+
+
+/* =========================================================
+   OPERATIONS
+   ========================================================= */
+
+.system-page .operation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px;
+}
+
+.system-page .operation-list .btn {
+    width: 100%;
+    justify-content: center;
+}
+
+.system-page .operation-list .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   STATUS MESSAGE
+   ========================================================= */
+
+.system-page .system-message {
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--panel);
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.system-page .last-updated {
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .system-page .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .system-page .content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .system-page .service-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .system-page {
+        padding: 18px;
+    }
+
+    .system-page .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .system-page .service-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .system-page .page-header {
+        flex-direction: column;
+    }
+}
+/* ============================================================
+   STANDARD TOPBAR SIZE
+   ============================================================ */
+
+:root {
+    --header-height: 68px;
+}
+
+.topbar {
+    height: var(--header-height);
+    padding: 0 22px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.brand-text h1 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.brand-text span {
+    font-size: 11px;
+}

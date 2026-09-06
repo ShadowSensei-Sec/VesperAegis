@@ -119,15 +119,11 @@ def main():
     # 1. Initialize nftables table
     # ---------------------------------------------------------
     print("\n[1] Initializing nftables...")
+    if firewall.table_exists():
+        print("[+] Removing existing VesperAegis firewall table...")
+        firewall.remove()
 
     firewall.create_table()
-
-    # ---------------------------------------------------------
-    # 2. Clear old rules
-    # ---------------------------------------------------------
-    print("\n[2] Clearing existing managed rules...")
-
-    firewall.flush()
 
     # ---------------------------------------------------------
     # 3. Create base chains
@@ -136,6 +132,7 @@ def main():
 
     firewall.create_base_chains()
 
+ 
     # ---------------------------------------------------------
     # 4. Configure forwarding foundation
     # ---------------------------------------------------------

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - VesperAegis Firewall</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/login.css?v=1"
+    >
+</head>
+
+<body>
+
+    <main class="login-container">
+
+        <section class="login-card">
+
+            <div class="login-brand">
+
+                <div class="login-logo">
+                    🦉
+                </div>
+
+                <h1>
+                    VesperAegis
+                </h1>
+
+                <p>
+                    Adaptive Network Security &amp;
+                    Traffic Intelligence
+                </p>
+
+            </div>
+
+
+<div class="login-form" id="login-form">
+    <h2>Sign in</h2>
+    <p class="login-subtitle">Access the VesperAegis security console.</p>
+
+    <div id="login-message" class="login-message hidden"></div>
+
+    <div class="form-field">
+        <label for="username">Username</label>
+        <input
+            id="username"
+            type="text"
+            autocomplete="username"
+            placeholder="Enter username"
+            required
+        >
+    </div>
+
+    <div class="form-field">
+        <label for="password">Password</label>
+        <input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter password"
+            required
+        >
+    </div>
+
+    <button id="login-button" type="button">Sign In</button>
+</div>
+
+<div class="login-form hidden" id="change-password-form">
+    <h2>Secure your account</h2>
+    <p class="login-subtitle">
+        This is your first login. Set a new username and password before continuing.
+    </p>
+
+    <div id="change-password-message" class="login-message hidden"></div>
+
+    <div class="form-field">
+        <label for="new-username">New Username</label>
+        <input
+            id="new-username"
+            type="text"
+            autocomplete="username"
+            placeholder="Enter new username"
+            required
+        >
+    </div>
+
+    <div class="form-field">
+        <label for="new-password">New Password</label>
+        <input
+            id="new-password"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Minimum 8 characters"
+            required
+        >
+    </div>
+
+    <button id="change-password-button" type="button">
+        Update Credentials
+    </button>
+</div>
+
+            <div class="login-footer">
+                VesperAegis Firewall · v1.0.0
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="/static/js/login.js?v=1"></script>
+
+</body>
+
+</html>

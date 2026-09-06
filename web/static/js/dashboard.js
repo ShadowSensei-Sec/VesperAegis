@@ -2,30 +2,93 @@
 // FIREWALL DASHBOARD
 // ============================================================
 
+let selectedRange = "1h";
+
 
 // ============================================================
-// LOAD DASHBOARD
+// HELPERS
 // ============================================================
 
-async function loadDashboard() {
+function formatBytes(bytes) {
+    bytes = Number(bytes) || 0;
 
-    // ========================================================
-    // FIREWALL STATUS
-    // ========================================================
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    }
+
+    if (bytes < 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    if (bytes < 1024 * 1024 * 1024) {
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+}
+
+
+function formatTime(timestamp) {
+    if (!timestamp) {
+        return "-";
+    }
+
+    const date = new Date(timestamp);
+
+    if (Number.isNaN(date.getTime())) {
+        return timestamp;
+    }
+
+    return date.toLocaleTimeString();
+}
+
+
+function formatEndpoint(ip, port) {
+    if (!ip) {
+        return "Any";
+    }
+
+    if (port !== null && port !== undefined) {
+        return `${ip}:${port}`;
+    }
+
+    return ip;
+}
+
+
+// ============================================================
+// FIREWALL STATUS
+// ============================================================
+
+async function loadStatus() {
+
+    const statusElement =
+        document.getElementById("status");
+
+    const firewallStatus =
+        document.getElementById("firewall-status");
 
     try {
 
-        const statusResponse =
+        const response =
             await fetch("/api/status");
 
-        const status =
-            await statusResponse.json();
+        if (!response.ok) {
+            throw new Error("Status request failed");
+        }
 
-        document.getElementById("firewall-status").textContent =
-            status.status;
+        const data =
+            await response.json();
 
-        document.getElementById("status").textContent =
+        statusElement.textContent =
             "Online";
+
+        statusElement.classList.remove("offline");
+
+        if (firewallStatus) {
+            firewallStatus.textContent =
+                data.status || "running";
+        }
 
     } catch (error) {
 
@@ -34,933 +97,198 @@ async function loadDashboard() {
             error
         );
 
-        document.getElementById("status").textContent =
+        statusElement.textContent =
             "Offline";
 
-        return;
+        statusElement.classList.add("offline");
+
+        if (firewallStatus) {
+            firewallStatus.textContent =
+                "offline";
+        }
     }
+}
 
 
-    // ========================================================
-    // FIREWALL RULES
-    // ========================================================
+// ============================================================
+// RULES
+// ============================================================
+
+async function loadRules() {
+
+    const table =
+        document.getElementById("rules-table");
 
     try {
 
-        const rulesResponse =
+        const response =
             await fetch("/api/rules");
 
-        const rulesData =
-            await rulesResponse.json();
+        if (!response.ok) {
+            throw new Error("Rules request failed");
+        }
+
+        const data =
+            await response.json();
 
         const rules =
-            rulesData.rules || [];
+            data.rules || [];
 
-
-        document.getElementById("rule-count").textContent =
-            rules.length;
-
-
-        const table =
-            document.getElementById("rules-table");
+        const activeRules =
+            rules.filter(rule => rule.enabled);
 
         table.innerHTML = "";
 
+        if (activeRules.length === 0) {
 
-        // ====================================================
-        // CREATE RULE ROWS
-        // ====================================================
+            table.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        No active firewall rules.
+                    </td>
+                </tr>
+            `;
 
-        rules.forEach(rule => {
+            return;
+        }
+
+        // Show only a small dashboard preview.
+        const previewRules =
+            activeRules.slice(0, 5);
+
+        previewRules.forEach(rule => {
 
             const row =
                 document.createElement("tr");
 
-
-            // ------------------------------------------------
-            // SOURCE
-            // ------------------------------------------------
-
             const source =
-                rule.source_ip || "Any";
+                formatEndpoint(
+                    rule.source_ip,
+                    rule.source_port
+                );
 
+            const destination =
+                formatEndpoint(
+                    rule.destination_ip,
+                    rule.destination_port
+                );
 
-            // ------------------------------------------------
-            // DESTINATION
-            // ------------------------------------------------
-
-            let destination =
-                "Any";
-
-            if (
-                rule.destination_ip &&
-                rule.destination_ip !== "any"
-            ) {
-
-                destination =
-                    rule.destination_ip;
-            }
-
-            if (rule.destination_port) {
-
-                destination +=
-                    `:${rule.destination_port}`;
-            }
-
-
-            // ------------------------------------------------
-            // TABLE ROW
-            // ------------------------------------------------
+            const actionClass =
+                rule.action === "allow"
+                    ? "action-allow"
+                    : "action-deny";
 
             row.innerHTML = `
+                <td>${rule.name || "-"}</td>
 
-                <td>
-                    ${rule.id ?? "-"}
+                <td class="${actionClass}">
+                    ${(rule.action || "-").toUpperCase()}
                 </td>
 
                 <td>
-                    ${rule.name ?? "-"}
+                    ${(rule.protocol || "any").toUpperCase()}
                 </td>
 
-                <td>
-                    ${rule.action ?? "-"}
-                </td>
+                <td>${source}</td>
 
-                <td>
-                    ${rule.protocol ?? "-"}
-                </td>
+                <td>${destination}</td>
 
-                <td>
-                    ${source}
-                </td>
-
-                <td>
-                    ${destination}
-                </td>
-
-                <td>
-                    ${
-                        rule.enabled
-                            ? "Enabled"
-                            : "Disabled"
-                    }
-                </td>
-
-                <td>
-                    ${rule.packets ?? 0}
-                </td>
-
-                <td>
-                    ${rule.bytes ?? 0}
-                </td>
-
-                <td>
-
-                    <button
-                        class="edit-rule"
-                        data-rule-id="${rule.id}"
-                    >
-                        Edit
-                    </button>
-
-
-                    <button
-                        class="toggle-rule"
-                        data-rule-id="${rule.id}"
-                    >
-                        ${
-                            rule.enabled
-                                ? "Disable"
-                                : "Enable"
-                        }
-                    </button>
-
-
-                    <button
-                        class="delete-rule"
-                        data-rule-id="${rule.id}"
-                    >
-                        Delete
-                    </button>
-
+                <td class="rule-enabled">
+                    Enabled
                 </td>
             `;
 
-
             table.appendChild(row);
-
-
-            // =================================================
-            // EDIT RULE
-            // =================================================
-
-            const editButton =
-                row.querySelector(".edit-rule");
-
-
-            editButton.addEventListener(
-                "click",
-                async function() {
-
-                    const ruleId =
-                        this.dataset.ruleId;
-
-
-                    try {
-
-                        const response =
-                            await fetch("/api/rules");
-
-                        const data =
-                            await response.json();
-
-
-                        const selectedRule =
-                            (data.rules || []).find(
-                                item =>
-                                    String(item.id) ===
-                                    String(ruleId)
-                            );
-
-
-                        if (!selectedRule) {
-
-                            alert(
-                                "Firewall rule not found"
-                            );
-
-                            return;
-                        }
-
-
-                        document
-                            .getElementById("edit-rule-id")
-                            .value =
-                            selectedRule.id;
-
-
-                        document
-                            .getElementById("edit-name")
-                            .value =
-                            selectedRule.name || "";
-
-
-                        document
-                            .getElementById("edit-action")
-                            .value =
-                            selectedRule.action ||
-                            "allow";
-
-
-                        document
-                            .getElementById("edit-protocol")
-                            .value =
-                            selectedRule.protocol ||
-                            "any";
-
-
-                        document
-                            .getElementById("edit-source-ip")
-                            .value =
-                            selectedRule.source_ip ||
-                            "";
-
-
-                        document
-                            .getElementById("edit-destination-ip")
-                            .value =
-                            selectedRule.destination_ip ||
-                            "";
-
-
-                        document
-                            .getElementById("edit-source-port")
-                            .value =
-                            selectedRule.source_port ??
-                            "";
-
-
-                        document
-                            .getElementById("edit-destination-port")
-                            .value =
-                            selectedRule.destination_port ??
-                            "";
-
-
-                        document
-                            .getElementById("edit-enabled")
-                            .checked =
-                            Boolean(
-                                selectedRule.enabled
-                            );
-
-
-                        document
-                            .getElementById("edit-rule-panel")
-                            .style.display =
-                            "block";
-
-
-                    } catch (error) {
-
-                        console.error(
-                            "[!] Edit error:",
-                            error
-                        );
-
-                        alert(
-                            "Failed to load firewall rule"
-                        );
-                    }
-                }
-            );
-
-
-            // =================================================
-            // ENABLE / DISABLE RULE
-            // =================================================
-
-            const toggleButton =
-                row.querySelector(".toggle-rule");
-
-
-            toggleButton.addEventListener(
-                "click",
-                async function(event) {
-
-                    event.preventDefault();
-
-
-                    const ruleId =
-                        this.dataset.ruleId;
-
-
-                    console.log(
-                        "[+] Toggle button clicked"
-                    );
-
-                    console.log(
-                        "[+] Rule ID:",
-                        ruleId
-                    );
-
-
-                    try {
-
-                        const response =
-                            await fetch(
-                                `/api/rules/${ruleId}/toggle`,
-                                {
-                                    method: "PATCH"
-                                }
-                            );
-
-
-                        console.log(
-                            "[+] Toggle HTTP status:",
-                            response.status
-                        );
-
-
-                        const result =
-                            await response.json();
-
-
-                        console.log(
-                            "[+] Toggle API response:",
-                            result
-                        );
-
-
-                        if (!response.ok) {
-
-                            document
-                                .getElementById(
-                                    "rule-message"
-                                )
-                                .textContent =
-                                result.detail ||
-                                "Failed to toggle firewall rule";
-
-                            return;
-                        }
-
-
-                        await loadDashboard();
-
-
-                    } catch (error) {
-
-                        console.error(
-                            "[!] Toggle error:",
-                            error
-                        );
-
-                        document
-                            .getElementById(
-                                "rule-message"
-                            )
-                            .textContent =
-                            "Failed to connect to firewall API";
-                    }
-                }
-            );
-
-
-            // =================================================
-            // DELETE RULE
-            // =================================================
-
-            const deleteButton =
-                row.querySelector(".delete-rule");
-
-
-            deleteButton.addEventListener(
-                "click",
-                async function() {
-
-                    const ruleId =
-                        this.dataset.ruleId;
-
-
-                    const confirmed =
-                        confirm(
-                            `Are you sure you want to delete firewall rule ${ruleId}?`
-                        );
-
-
-                    if (!confirmed) {
-                        return;
-                    }
-
-
-                    console.log(
-                        "[+] Delete button clicked"
-                    );
-
-                    console.log(
-                        "[+] Rule ID:",
-                        ruleId
-                    );
-
-
-                    try {
-
-                        const response =
-                            await fetch(
-                                `/api/rules/${ruleId}`,
-                                {
-                                    method: "DELETE"
-                                }
-                            );
-
-
-                        let result = {};
-
-                        try {
-
-                            result =
-                                await response.json();
-
-                        } catch (jsonError) {
-
-                            console.warn(
-                                "[!] Delete response was not JSON"
-                            );
-                        }
-
-
-                        console.log(
-                            "[+] Delete HTTP status:",
-                            response.status
-                        );
-
-
-                        console.log(
-                            "[+] Delete API response:",
-                            result
-                        );
-
-
-                        // ------------------------------------------------
-                        // SERVER ERROR
-                        // ------------------------------------------------
-
-                        if (!response.ok) {
-
-                            console.error(
-                                "[!] Delete API returned:",
-                                response.status
-                            );
-
-                            console.error(
-                                "[!] Delete API detail:",
-                                result.detail
-                            );
-
-
-                            /*
-                             * The backend currently returns HTTP 500
-                             * even though the rule is being removed.
-                             *
-                             * Do not display a misleading
-                             * "Unable to delete firewall rule"
-                             * message here.
-                             *
-                             * Reload the dashboard so the current
-                             * database state is reflected.
-                             */
-
-                            await loadDashboard();
-
-                            return;
-                        }
-
-
-                        // ------------------------------------------------
-                        // SUCCESS
-                        // ------------------------------------------------
-
-                        console.log(
-                            "[+] Rule deleted successfully:",
-                            ruleId
-                        );
-
-
-                        await loadDashboard();
-
-                    } catch (error) {
-
-                        console.error(
-                            "[!] Delete request error:",
-                            error
-                        );
-
-                        /*
-                         * This means the browser could not
-                         * communicate with the API at all.
-                         */
-
-                        document
-                            .getElementById(
-                                "rule-message"
-                            )
-                            .textContent =
-                            "Failed to connect to firewall API";
-                    }
-                }
-            );
-
         });
-
 
     } catch (error) {
 
         console.error(
-            "[!] Failed to load firewall rules:",
+            "[!] Failed to load rules:",
             error
         );
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty-state">
+                    Failed to load firewall rules.
+                </td>
+            </tr>
+        `;
     }
+}
 
 
-    // ========================================================
-    // TRAFFIC STATISTICS
-    // ========================================================
+// ============================================================
+// STATISTICS
+// ============================================================
+
+async function loadStatistics() {
 
     try {
 
-        const statsResponse =
-            await fetch("/api/statistics");
+        const response =
+            await fetch(
+                `/api/statistics?range=${selectedRange}`
+            );
 
+        if (!response.ok) {
+            throw new Error(
+                "Statistics request failed"
+            );
+        }
 
         const stats =
-            await statsResponse.json();
+            await response.json();
 
 
-        // ========================================================
-        // SUMMARY CARDS
-        // ========================================================
+        // ================================================
+        // SUMMARY
+        // ================================================
 
         document
             .getElementById("packet-count")
             .textContent =
-            stats.total_packets ?? 0;
-
-
-        document
-            .getElementById("byte-count")
-            .textContent =
-            stats.total_bytes ?? 0;
+            Number(stats.total_packets || 0)
+                .toLocaleString();
 
 
         document
             .getElementById("accepted-count")
             .textContent =
-            stats.accepted_packets ?? 0;
+            Number(stats.accepted_packets || 0)
+                .toLocaleString();
 
 
         document
             .getElementById("dropped-count")
             .textContent =
-            stats.dropped_packets ?? 0;
+            Number(stats.dropped_packets || 0)
+                .toLocaleString();
 
 
         document
-            .getElementById("tcp-count")
+            .getElementById("byte-count")
             .textContent =
-            stats.protocols?.tcp?.packets ?? 0;
+            formatBytes(stats.total_bytes);
 
 
-        document
-            .getElementById("udp-count")
-            .textContent =
-            stats.protocols?.udp?.packets ?? 0;
+        // ================================================
+        // PROTOCOL DISTRIBUTION
+        // ================================================
 
+        renderProtocols(
+            stats.protocols || {}
+        );
 
-        // ========================================================
-        // PROTOCOL ANALYTICS
-        // ========================================================
 
-        const protocolTable =
-            document.getElementById("protocol-table");
+        // ================================================
+        // TRAFFIC OVERVIEW
+        // ================================================
 
-
-        if (protocolTable) {
-
-            protocolTable.innerHTML = "";
-
-
-            Object.entries(
-                stats.protocols || {}
-            )
-                .sort(
-                    (a, b) =>
-                        b[1].packets -
-                        a[1].packets
-                )
-                .forEach(
-                    ([protocol, data]) => {
-
-                        const row =
-                            document.createElement("tr");
-
-
-                        row.innerHTML = `
-                            <td>${protocol}</td>
-                            <td>${data.packets}</td>
-                            <td>${data.bytes}</td>
-                        `;
-
-
-                        protocolTable.appendChild(row);
-                    }
-                );
-        }
-
-
-        // ========================================================
-        // SOURCE IP ANALYTICS
-        // ========================================================
-
-        const sourceIpTable =
-            document.getElementById(
-                "source-ip-table"
-            );
-
-
-        if (sourceIpTable) {
-
-            sourceIpTable.innerHTML = "";
-
-
-            Object.entries(
-                stats.ips?.source_ips || {}
-            )
-                .sort(
-                    (a, b) =>
-                        b[1].packets -
-                        a[1].packets
-                )
-                .slice(0, 10)
-                .forEach(
-                    ([ip, data]) => {
-
-                        const row =
-                            document.createElement("tr");
-
-
-                        row.innerHTML = `
-                            <td>${ip}</td>
-                            <td>${data.packets}</td>
-                            <td>${data.bytes}</td>
-                        `;
-
-
-                        sourceIpTable.appendChild(row);
-                    }
-                );
-        }
-
-
-        // ========================================================
-        // DESTINATION IP ANALYTICS
-        // ========================================================
-
-        const destinationIpTable =
-            document.getElementById(
-                "destination-ip-table"
-            );
-
-
-        if (destinationIpTable) {
-
-            destinationIpTable.innerHTML = "";
-
-
-            Object.entries(
-                stats.ips?.destination_ips || {}
-            )
-                .sort(
-                    (a, b) =>
-                        b[1].packets -
-                        a[1].packets
-                )
-                .slice(0, 10)
-                .forEach(
-                    ([ip, data]) => {
-
-                        const row =
-                            document.createElement("tr");
-
-
-                        row.innerHTML = `
-                            <td>${ip}</td>
-                            <td>${data.packets}</td>
-                            <td>${data.bytes}</td>
-                        `;
-
-
-                        destinationIpTable.appendChild(row);
-                    }
-                );
-        }
-
-
-        // ========================================================
-        // SOURCE PORT ANALYTICS
-        // ========================================================
-
-        const sourcePortTable =
-            document.getElementById(
-                "source-port-table"
-            );
-
-
-        if (sourcePortTable) {
-
-            sourcePortTable.innerHTML = "";
-
-
-            Object.entries(
-                stats.ports?.source_ports || {}
-            )
-                .sort(
-                    (a, b) =>
-                        b[1].packets -
-                        a[1].packets
-                )
-                .slice(0, 10)
-                .forEach(
-                    ([port, data]) => {
-
-                        const row =
-                            document.createElement("tr");
-
-
-                        row.innerHTML = `
-                            <td>${port}</td>
-                            <td>${data.packets}</td>
-                            <td>${data.bytes}</td>
-                        `;
-
-
-                        sourcePortTable.appendChild(row);
-                    }
-                );
-        }
-
-
-        // ========================================================
-        // DESTINATION PORT ANALYTICS
-        // ========================================================
-
-        const destinationPortTable =
-            document.getElementById(
-                "destination-port-table"
-            );
-
-
-        if (destinationPortTable) {
-
-            destinationPortTable.innerHTML = "";
-
-
-            Object.entries(
-                stats.ports?.destination_ports || {}
-            )
-                .sort(
-                    (a, b) =>
-                        b[1].packets -
-                        a[1].packets
-                )
-                .slice(0, 10)
-                .forEach(
-                    ([port, data]) => {
-
-                        const row =
-                            document.createElement("tr");
-
-
-                        row.innerHTML = `
-                            <td>${port}</td>
-                            <td>${data.packets}</td>
-                            <td>${data.bytes}</td>
-                        `;
-
-
-                        destinationPortTable.appendChild(row);
-                    }
-                );
-        }
-
-
-        // ========================================================
-        // RULE ANALYTICS
-        // ========================================================
-
-        const ruleStatisticsTable =
-            document.getElementById(
-                "rule-statistics-table"
-            );
-
-
-        if (ruleStatisticsTable) {
-
-            ruleStatisticsTable.innerHTML = "";
-
-
-            (
-                stats
-                    .rule_statistics
-                    ?.most_used_rules ||
-                []
-            )
-                .forEach(
-                    rule => {
-
-                        const row =
-                            document.createElement("tr");
-
-
-                        row.innerHTML = `
-                            <td>${rule.rule}</td>
-                            <td>${rule.action}</td>
-                            <td>${rule.packets}</td>
-                            <td>${rule.bytes}</td>
-                        `;
-
-
-                        ruleStatisticsTable.appendChild(row);
-                    }
-                );
-        }
-
-
-        // ========================================================
-        // ZERO-HIT RULES
-        // ========================================================
-
-        const zeroHitRuleTable =
-            document.getElementById(
-                "zero-hit-rule-table"
-            );
-
-
-        if (zeroHitRuleTable) {
-
-            zeroHitRuleTable.innerHTML = "";
-
-
-            (
-                stats
-                    .rule_statistics
-                    ?.zero_hit_rules ||
-                []
-            )
-                .forEach(
-                    rule => {
-
-                        const row =
-                            document.createElement("tr");
-
-
-                        row.innerHTML = `
-                            <td>${rule.rule}</td>
-                            <td>${rule.action}</td>
-                            <td>${rule.packets}</td>
-                            <td>${rule.bytes}</td>
-                        `;
-
-
-                        zeroHitRuleTable.appendChild(row);
-                    }
-                );
-        }
-
-
-        // ========================================================
-        // TIME ANALYTICS
-        // ========================================================
-
-        const timeStatisticsTable =
-            document.getElementById(
-                "time-statistics-table"
-            );
-
-
-        if (timeStatisticsTable) {
-
-            timeStatisticsTable.innerHTML = "";
-
-
-            Object.entries(
-                stats.time_statistics || {}
-            )
-                .sort(
-                    (a, b) =>
-                        b[0].localeCompare(a[0])
-                )
-                .forEach(
-                    ([hour, data]) => {
-
-                        const row =
-                            document.createElement("tr");
-
-
-                        row.innerHTML = `
-                            <td>${hour}</td>
-                            <td>${data.packets}</td>
-                            <td>${data.bytes}</td>
-                            <td>${data.allowed_packets}</td>
-                            <td>${data.dropped_packets}</td>
-                        `;
-
-
-                        timeStatisticsTable.appendChild(row);
-                    }
-                );
-        }
-
+        renderTrafficOverview(
+            stats.time_statistics || {}
+        );
 
     } catch (error) {
 
@@ -968,474 +296,611 @@ async function loadDashboard() {
             "[!] Failed to load statistics:",
             error
         );
+
+        document
+            .getElementById("packet-count")
+            .textContent = "0";
+
+        document
+            .getElementById("accepted-count")
+            .textContent = "0";
+
+        document
+            .getElementById("dropped-count")
+            .textContent = "0";
+
+        document
+            .getElementById("byte-count")
+            .textContent = "0 B";
+
+        renderProtocols({});
+
+        renderTrafficOverview({});
     }
 }
 
 
 // ============================================================
-// INITIAL DASHBOARD LOAD
+// PROTOCOL DISTRIBUTION
 // ============================================================
 
-loadDashboard();
+function renderProtocols(protocols) {
+
+    const container =
+        document.getElementById(
+            "protocol-distribution"
+        );
+
+    container.innerHTML = "";
+
+    const entries =
+        Object.entries(protocols)
+            .filter(
+                ([, data]) =>
+                    Number(data.packets || 0) > 0
+            )
+            .sort(
+                (a, b) =>
+                    Number(b[1].packets || 0) -
+                    Number(a[1].packets || 0)
+            );
+
+    if (entries.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty-state">
+                No protocol data available.
+            </div>
+        `;
+
+        return;
+    }
+
+    entries.forEach(
+        ([protocol, data]) => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "protocol-item";
+
+            item.innerHTML = `
+                <span class="protocol-name">
+                    ${protocol.toUpperCase()}
+                </span>
+
+                <span class="protocol-value">
+                    ${Number(data.packets || 0).toLocaleString()}
+                    packets ·
+                    ${formatBytes(data.bytes)}
+                </span>
+            `;
+
+            container.appendChild(item);
+        }
+    );
+}
 
 
 // ============================================================
-// AUTO REFRESH
+// TRAFFIC OVERVIEW
 // ============================================================
 
-setInterval(
-    loadDashboard,
-    5000
+function renderTrafficOverview(timeStatistics) {
+
+    const chart =
+        document.getElementById(
+            "traffic-chart"
+        );
+
+    if (!chart) {
+        return;
+    }
+
+    chart.innerHTML = "";
+
+
+    const entries =
+        Object.entries(timeStatistics || {})
+            .sort(
+                (a, b) =>
+                    a[0].localeCompare(b[0])
+            );
+
+
+    // ---------------------------------------------------------
+    // NO DATA
+    // ---------------------------------------------------------
+
+    if (entries.length === 0) {
+
+        chart.innerHTML = `
+            <div class="traffic-empty">
+                <div class="traffic-empty-title">
+                    No traffic data available
+                </div>
+
+                <div class="traffic-empty-text">
+                    Traffic activity will appear here
+                    when firewall events are recorded.
+                </div>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    // ---------------------------------------------------------
+    // FIND MAXIMUM PACKET COUNT
+    // ---------------------------------------------------------
+
+    const maximumPackets =
+        Math.max(
+            ...entries.map(
+                ([, data]) =>
+                    Number(
+                        data.packets || 0
+                    )
+            ),
+            1
+        );
+
+
+    // ---------------------------------------------------------
+    // CHART
+    // ---------------------------------------------------------
+
+    const chartWrapper =
+        document.createElement("div");
+
+    chartWrapper.className =
+        "traffic-chart-wrapper";
+
+
+    const chartArea =
+        document.createElement("div");
+
+    chartArea.className =
+        "traffic-bars";
+
+
+    // ---------------------------------------------------------
+    // SHOW LAST 12 TIME PERIODS
+    // ---------------------------------------------------------
+
+    entries
+        .slice(-12)
+        .forEach(
+            ([time, data]) => {
+
+                const packets =
+                    Number(
+                        data.packets || 0
+                    );
+
+                const bytes =
+                    Number(
+                        data.bytes || 0
+                    );
+
+                const allowed =
+                    Number(
+                        data.allowed_packets || 0
+                    );
+
+                const dropped =
+                    Number(
+                        data.dropped_packets || 0
+                    );
+
+
+                const percentage =
+                    Math.max(
+                        2,
+                        (packets /
+                            maximumPackets) *
+                            100
+                    );
+
+
+                const barGroup =
+                    document.createElement(
+                        "div"
+                    );
+
+                barGroup.className =
+                    "traffic-bar-group";
+
+
+                const bar =
+                    document.createElement(
+                        "div"
+                    );
+
+                bar.className =
+                    "traffic-bar";
+
+
+                bar.style.height =
+                    `${percentage}%`;
+
+
+                bar.title =
+                    `${time} | ` +
+                    `${packets.toLocaleString()} packets | ` +
+                    `${formatBytes(bytes)}`;
+
+
+                const label =
+                    document.createElement(
+                        "div"
+                    );
+
+                label.className =
+                    "traffic-bar-label";
+
+
+                label.textContent =
+                    time.slice(11);
+
+
+                const value =
+                    document.createElement(
+                        "div"
+                    );
+
+                value.className =
+                    "traffic-bar-value";
+
+
+                value.textContent =
+                    packets.toLocaleString();
+
+
+                barGroup.appendChild(
+                    value
+                );
+
+                barGroup.appendChild(
+                    bar
+                );
+
+                barGroup.appendChild(
+                    label
+                );
+
+
+                chartArea.appendChild(
+                    barGroup
+                );
+
+
+                // Store details for tooltip/debugging
+                bar.dataset.packets =
+                    packets;
+
+                bar.dataset.bytes =
+                    bytes;
+
+                bar.dataset.allowed =
+                    allowed;
+
+                bar.dataset.dropped =
+                    dropped;
+            }
+        );
+
+
+    chartWrapper.appendChild(
+        chartArea
+    );
+
+
+    // ---------------------------------------------------------
+    // LEGEND
+    // ---------------------------------------------------------
+
+    const legend =
+        document.createElement("div");
+
+    legend.className =
+        "traffic-chart-legend";
+
+
+    legend.innerHTML = `
+        <span>
+            Packets per hour
+        </span>
+
+        <span>
+            ${entries.length}
+            recorded periods
+        </span>
+    `;
+
+
+    chartWrapper.appendChild(
+        legend
+    );
+
+
+    chart.appendChild(
+        chartWrapper
+    );
+}
+
+// ============================================================
+// RECENT SECURITY EVENTS
+// ============================================================
+
+async function loadRecentEvents() {
+
+    const table =
+        document.getElementById(
+            "events-table"
+        );
+
+    try {
+
+        const response =
+            await fetch("/api/logs?limit=5");
+
+        if (!response.ok) {
+            throw new Error(
+                "Logs request failed"
+            );
+        }
+
+        const data =
+            await response.json();
+
+        const events =
+            data.events || [];
+
+        table.innerHTML = "";
+
+        if (events.length === 0) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        No security events recorded.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        events.slice(0, 5).forEach(
+            event => {
+
+                const row =
+                    document.createElement("tr");
+
+                const action =
+                    event.action || "unknown";
+
+                const actionClass =
+                    action === "allow"
+                        ? "action-allow"
+                        : action === "deny" ||
+                          action === "drop"
+                            ? "action-deny"
+                            : "";
+
+                row.innerHTML = `
+                    <td>
+                        ${formatTime(event.timestamp)}
+                    </td>
+
+                    <td class="${actionClass}">
+                        ${action.toUpperCase()}
+                    </td>
+
+                    <td>
+                        ${(event.protocol || "-").toUpperCase()}
+                    </td>
+
+                    <td>
+                        ${formatEndpoint(
+                            event.source_ip,
+                            event.source_port
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatEndpoint(
+                            event.destination_ip,
+                            event.destination_port
+                        )}
+                    </td>
+
+                    <td>
+                        ${event.rule_name || "-"}
+                    </td>
+                `;
+
+                table.appendChild(row);
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "[!] Failed to load security events:",
+            error
+        );
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty-state">
+                    Failed to load security events.
+                </td>
+            </tr>
+        `;
+    }
+}
+
+
+// ============================================================
+// LOAD DASHBOARD
+// ============================================================
+
+async function loadDashboard() {
+
+    await Promise.all([
+        loadStatus(),
+        loadRules(),
+        loadStatistics(),
+        loadRecentEvents()
+    ]);
+
+    const updated =
+        document.getElementById(
+            "last-updated"
+        );
+
+    if (updated) {
+
+        updated.textContent =
+            `Last updated: ${
+                new Date().toLocaleTimeString()
+            }`;
+    }
+}
+
+
+// ============================================================
+// REFRESH BUTTON
+// ============================================================
+
+const refreshButton =
+    document.getElementById(
+        "refresh-button"
+    );
+
+if (refreshButton) {
+
+    refreshButton.addEventListener(
+        "click",
+        async function() {
+
+            refreshButton.disabled = true;
+
+            refreshButton.textContent =
+                "Refreshing...";
+
+            await loadDashboard();
+
+            refreshButton.disabled = false;
+
+            refreshButton.textContent =
+                "Refresh";
+        }
+    );
+}
+
+
+// ============================================================
+// TIME RANGE
+// ============================================================
+
+const rangeButtons =
+    document.querySelectorAll(
+        ".time-range-button"
+    );
+
+rangeButtons.forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            async function() {
+
+                rangeButtons.forEach(
+                    item =>
+                        item.classList.remove(
+                            "active"
+                        )
+                );
+
+                this.classList.add("active");
+
+                selectedRange =
+                    this.dataset.range;
+
+                await loadStatistics();
+
+                const updated =
+                    document.getElementById(
+                        "last-updated"
+                    );
+
+                if (updated) {
+
+                    updated.textContent =
+                        `Last updated: ${
+                            new Date().toLocaleTimeString()
+                        }`;
+                }
+            }
+        );
+    }
 );
 
 
 // ============================================================
-// ADD FIREWALL RULE
+// VIEW ALL BUTTONS
 // ============================================================
 
-const ruleForm =
-    document.getElementById("rule-form");
-
-
-if (ruleForm) {
-
-    ruleForm.addEventListener(
-        "submit",
-        async function(event) {
-
-            event.preventDefault();
-
-
-            console.log(
-                "[+] Add Rule form submitted"
-            );
-
-
-            // ------------------------------------------------
-            // FORM VALUES
-            // ------------------------------------------------
-
-            const name =
-                document
-                    .getElementById("name")
-                    .value
-                    .trim();
-
-
-            const action =
-                document
-                    .getElementById("action")
-                    .value;
-
-
-            const protocol =
-                document
-                    .getElementById("protocol")
-                    .value ||
-                "any";
-
-
-            const sourceIP =
-                document
-                    .getElementById("source_ip")
-                    .value
-                    .trim();
-
-
-            const destinationIP =
-                document
-                    .getElementById("destination_ip")
-                    .value
-                    .trim();
-
-
-            const sourcePortValue =
-                document
-                    .getElementById("source_port")
-                    .value
-                    .trim();
-
-
-            const destinationPortValue =
-                document
-                    .getElementById("destination_port")
-                    .value
-                    .trim();
-
-
-            // ------------------------------------------------
-            // VALIDATION
-            // ------------------------------------------------
-
-            if (!name) {
-
-                alert(
-                    "Please enter a rule name."
-                );
-
-                return;
-            }
-
-
-            // ------------------------------------------------
-            // BUILD RULE
-            // ------------------------------------------------
-
-            const rule = {
-
-                name: name,
-
-                action: action,
-
-                protocol: protocol,
-
-                source_ip:
-                    sourceIP || null,
-
-                destination_ip:
-                    destinationIP || null,
-
-                source_port:
-                    sourcePortValue
-                        ? Number(sourcePortValue)
-                        : null,
-
-                destination_port:
-                    destinationPortValue
-                        ? Number(destinationPortValue)
-                        : null
-            };
-
-
-            console.log(
-                "[+] Sending firewall rule:",
-                rule
-            );
-
-
-            // ------------------------------------------------
-            // SEND API REQUEST
-            // ------------------------------------------------
-
-            try {
-
-                const response =
-                    await fetch(
-                        "/api/rules",
-                        {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                            body:
-                                JSON.stringify(rule)
-                        }
-                    );
-
-
-                const result =
-                    await response.json();
-
-
-                console.log(
-                    "[+] API response:",
-                    result
-                );
-
-
-                // ------------------------------------------------
-                // ERROR
-                // ------------------------------------------------
-
-                if (!response.ok) {
-
-                    document
-                        .getElementById(
-                            "rule-message"
-                        )
-                        .textContent =
-                        result.detail ||
-                        "Failed to create firewall rule";
-
-                    return;
-                }
-
-
-                // ------------------------------------------------
-                // SUCCESS
-                // ------------------------------------------------
-
-                document
-                    .getElementById(
-                        "rule-message"
-                    )
-                    .textContent =
-                    result.message ||
-                    "Firewall rule added successfully";
-
-
-                ruleForm.reset();
-
-
-                await loadDashboard();
-
-
-            } catch (error) {
-
-                console.error(
-                    "[!] Add rule error:",
-                    error
-                );
-
-
-                document
-                    .getElementById(
-                        "rule-message"
-                    )
-                    .textContent =
-                    "Failed to connect to firewall API";
-            }
-        }
-    );
-
-} else {
-
-    console.error(
-        "[!] Firewall rule form not found."
-    );
-}
-
-
-// ============================================================
-// EDIT FIREWALL RULE
-// ============================================================
-
-const editForm =
+const viewAllRules =
     document.getElementById(
-        "edit-rule-form"
+        "view-all-rules"
     );
 
+if (viewAllRules) {
 
-const cancelEditButton =
-    document.getElementById(
-        "cancel-edit"
-    );
-
-
-if (editForm) {
-
-    editForm.addEventListener(
-        "submit",
-        async function(event) {
-
-            event.preventDefault();
-
-
-            const ruleId =
-                document
-                    .getElementById(
-                        "edit-rule-id"
-                    )
-                    .value;
-
-
-            const sourcePortValue =
-                document
-                    .getElementById(
-                        "edit-source-port"
-                    )
-                    .value
-                    .trim();
-
-
-            const destinationPortValue =
-                document
-                    .getElementById(
-                        "edit-destination-port"
-                    )
-                    .value
-                    .trim();
-
-
-            const rule = {
-
-                name:
-                    document
-                        .getElementById(
-                            "edit-name"
-                        )
-                        .value
-                        .trim(),
-
-
-                action:
-                    document
-                        .getElementById(
-                            "edit-action"
-                        )
-                        .value,
-
-
-                protocol:
-                    document
-                        .getElementById(
-                            "edit-protocol"
-                        )
-                        .value ||
-                    "any",
-
-
-                source_ip:
-                    document
-                        .getElementById(
-                            "edit-source-ip"
-                        )
-                        .value
-                        .trim() ||
-                    null,
-
-
-                destination_ip:
-                    document
-                        .getElementById(
-                            "edit-destination-ip"
-                        )
-                        .value
-                        .trim() ||
-                    null,
-
-
-                source_port:
-                    sourcePortValue
-                        ? Number(sourcePortValue)
-                        : null,
-
-
-                destination_port:
-                    destinationPortValue
-                        ? Number(destinationPortValue)
-                        : null,
-
-
-                enabled:
-                    document
-                        .getElementById(
-                            "edit-enabled"
-                        )
-                        .checked,
-
-
-                description:
-                    "",
-
-
-                priority:
-                    100
-            };
-
-
-            console.log(
-                "[+] Updating firewall rule:",
-                ruleId,
-                rule
-            );
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        `/api/rules/${ruleId}`,
-                        {
-                            method: "PUT",
-
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                            body:
-                                JSON.stringify(rule)
-                        }
-                    );
-
-
-                const result =
-                    await response.json();
-
-
-                if (!response.ok) {
-
-                    document
-                        .getElementById(
-                            "edit-message"
-                        )
-                        .textContent =
-                        result.detail ||
-                        "Failed to update rule";
-
-                    return;
-                }
-
-
-                document
-                    .getElementById(
-                        "edit-message"
-                    )
-                    .textContent =
-                    "Firewall rule updated successfully";
-
-
-                document
-                    .getElementById(
-                        "edit-rule-panel"
-                    )
-                    .style.display =
-                    "none";
-
-
-                await loadDashboard();
-
-
-            } catch (error) {
-
-                console.error(
-                    "[!] Update error:",
-                    error
-                );
-
-
-                document
-                    .getElementById(
-                        "edit-message"
-                    )
-                    .textContent =
-                    "Failed to connect to firewall API";
-            }
-        }
-    );
-}
-
-
-// ============================================================
-// CANCEL EDIT
-// ============================================================
-
-if (cancelEditButton) {
-
-    cancelEditButton.addEventListener(
+    viewAllRules.addEventListener(
         "click",
         function() {
 
-            document
-                .getElementById(
-                    "edit-rule-panel"
-                )
-                .style.display =
-                "none";
+            /*
+             * Rules page will be implemented next.
+             */
+            window.location.href =
+                "/rules";
         }
     );
 }
+
+
+const viewAllLogs =
+    document.getElementById(
+        "view-all-logs"
+    );
+
+if (viewAllLogs) {
+
+    viewAllLogs.addEventListener(
+        "click",
+        function() {
+
+            /*
+             * Logs page will be implemented
+             * after the dashboard.
+             */
+            window.location.href =
+                "/logs";
+        }
+    );
+}
+
+
+// ============================================================
+// INITIAL LOAD
+// ============================================================
+
+loadDashboard();

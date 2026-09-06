@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>VesperAegis</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/dashboard.css?v=4"
+    >
+    <link
+        rel="stylesheet"
+        href="/static/css/system.css?v=1"
+    >
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- ===================================================== -->
+    <!-- SIDEBAR -->
+    <!-- ===================================================== -->
+
+<aside class="sidebar">
+
+    <nav class="sidebar-nav">
+
+        <a href="/" class="nav-item">
+            <span class="nav-icon">⌂</span>
+            <span class="nav-label">Dashboard</span>
+        </a>
+
+        <a href="/rules" class="nav-item">
+            <span class="nav-icon">☷</span>
+            <span class="nav-label">Rules</span>
+        </a>
+
+        <a href="/logs" class="nav-item">
+            <span class="nav-icon">▣</span>
+            <span class="nav-label">Logs</span>
+        </a>
+
+        <a href="/traffic" class="nav-item">
+            <span class="nav-icon">◫</span>
+            <span class="nav-label">Traffic</span>
+        </a>
+
+        <a href="/system" class="nav-item">
+            <span class="nav-icon">▦</span>
+            <span class="nav-label">System</span>
+        </a>
+
+        <a href="/ai" class="nav-item">
+            <span class="nav-icon">✦</span>
+            <span class="nav-label">AI Assistant</span>
+        </a>
+
+
+    </nav>
+
+    <div class="sidebar-footer">
+        <button
+            type="button"
+            id="logout-button"
+            class="nav-item logout-button"
+        >
+            <span class="nav-icon">↪</span>
+            <span class="nav-label">Logout</span>
+        </button>
+    </div>
+
+</aside>
+
+
+    <!-- ===================================================== -->
+    <!-- MAIN CONTENT -->
+    <!-- ===================================================== -->
+
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    🦉
+                </div>
+                 
+                <div class="brand-text"
+                    <h1>VesperAegis</h1>
+                    <span>
+                        Adaptive Network Security & Traffic Intelligence
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+
+        <section class="page-content system-page">
+
+            <!-- PAGE HEADER -->
+
+            <div class="page-header">
+
+                <div>
+                    <h1>System</h1>
+
+                    <p>
+                        Firewall system health and operational status
+                    </p>
+                </div>
+
+                <button
+                    id="refresh-system"
+                    class="btn btn-primary"
+                    type="button"
+                >
+                    ↻ Refresh
+                </button>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- SYSTEM OVERVIEW -->
+            <!-- ================================================= -->
+
+            <section class="dashboard-grid summary-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-card-header">
+                        <span>Firewall Status</span>
+                        <span class="stat-icon">●</span>
+                    </div>
+
+                    <div
+                        id="firewall-status"
+                        class="stat-value"
+                    >
+                        Loading...
+                    </div>
+
+                    <div class="stat-label">
+                        Application state
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-header">
+                        <span>Hostname</span>
+                        <span class="stat-icon">◆</span>
+                    </div>
+
+                    <div
+                        id="hostname"
+                        class="stat-value"
+                    >
+                        Loading...
+                    </div>
+
+                    <div class="stat-label">
+                        Firewall host
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-header">
+                        <span>Kernel</span>
+                        <span class="stat-icon">◈</span>
+                    </div>
+
+                    <div
+                        id="kernel"
+                        class="stat-value"
+                    >
+                        Loading...
+                    </div>
+
+                    <div class="stat-label">
+                        Linux kernel
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-card-header">
+                        <span>Uptime</span>
+                        <span class="stat-icon">◷</span>
+                    </div>
+
+                    <div
+                        id="uptime"
+                        class="stat-value"
+                    >
+                        Loading...
+                    </div>
+
+                    <div class="stat-label">
+                        System uptime
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- RESOURCE USAGE -->
+            <!-- ================================================= -->
+
+            <section class="content-grid">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2>Resource Usage</h2>
+
+                            <p>
+                                Live system resource utilization
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="resource-list">
+
+                        <div class="resource-item">
+
+                            <div class="resource-header">
+                                <span>CPU Usage</span>
+
+                                <strong id="cpu-usage">
+                                    Loading...
+                                </strong>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div
+                                    id="cpu-progress"
+                                    class="progress-fill"
+                                    style="width: 0%"
+                                ></div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="resource-item">
+
+                            <div class="resource-header">
+                                <span>Memory Usage</span>
+
+                                <strong id="memory-usage">
+                                    Loading...
+                                </strong>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div
+                                    id="memory-progress"
+                                    class="progress-fill"
+                                    style="width: 0%"
+                                ></div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="resource-item">
+
+                            <div class="resource-header">
+                                <span>Disk Usage</span>
+
+                                <strong id="disk-usage">
+                                    Loading...
+                                </strong>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div
+                                    id="disk-progress"
+                                    class="progress-fill"
+                                    style="width: 0%"
+                                ></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SYSTEM INFORMATION -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2>System Information</h2>
+
+                            <p>
+                                Information collected from this host
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-list">
+
+                        <div class="info-row">
+                            <span>Operating System</span>
+                            <strong id="operating-system">
+                                Loading...
+                            </strong>
+                        </div>
+
+                        <div class="info-row">
+                            <span>OS Release</span>
+                            <strong id="os-release">
+                                Loading...
+                            </strong>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Architecture</span>
+                            <strong id="architecture">
+                                Loading...
+                            </strong>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Processor</span>
+                            <strong id="processor">
+                                Loading...
+                            </strong>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Logical Cores</span>
+                            <strong id="logical-cores">
+                                Loading...
+                            </strong>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Physical Cores</span>
+                            <strong id="physical-cores">
+                                Loading...
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- NETWORK INTERFACES -->
+            <!-- ================================================= -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Network Interfaces</h2>
+
+                        <p>
+                            Live network interface information
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="data-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Interface</th>
+                                <th>Status</th>
+                                <th>IPv4</th>
+                                <th>IPv6</th>
+                                <th>MAC Address</th>
+                                <th>RX Packets</th>
+                                <th>TX Packets</th>
+                                <th>RX Bytes</th>
+                                <th>TX Bytes</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="network-interfaces">
+
+                            <tr>
+                                <td colspan="9" class="empty-state">
+                                    Loading network interfaces...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- FIREWALL SERVICES -->
+            <!-- ================================================= -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Firewall Services</h2>
+
+                        <p>
+                            Operational status of firewall components
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="firewall-services"
+                    class="service-grid"
+                >
+
+                    <div class="service-card">
+                        <span>Loading...</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- CONFIGURATION STATUS -->
+            <!-- ================================================= -->
+
+            <section class="content-grid">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2>Configuration Status</h2>
+
+                            <p>
+                                Current firewall configuration
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-list">
+
+                        <div class="info-row">
+                            <span>Input Policy</span>
+                            <strong id="input-policy">
+                                Loading...
+                            </strong>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Output Policy</span>
+                            <strong id="output-policy">
+                                Loading...
+                            </strong>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Forward Policy</span>
+                            <strong id="forward-policy">
+                                Loading...
+                            </strong>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Active Rules</span>
+                            <strong id="active-rules">
+                                Loading...
+                            </strong>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Disabled Rules</span>
+                            <strong id="disabled-rules">
+                                Loading...
+                            </strong>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Total Rules</span>
+                            <strong id="total-rules">
+                                Loading...
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OPERATIONS -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2>Operations</h2>
+
+                            <p>
+                                Firewall administrative actions
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="operation-list">
+
+                        <button
+                            id="refresh-operation"
+                            class="btn btn-secondary"
+                            type="button"
+                        >
+                            ↻ Refresh System Information
+                        </button>
+
+                        <button
+                            id="apply-configuration"
+                            class="btn btn-primary"
+                            type="button"
+                            disabled
+                            title="Will be enabled after secure privilege configuration"
+                        >
+                            Apply Firewall Configuration
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <div
+                id="system-message"
+                class="system-message"
+                hidden
+            ></div>
+
+
+            <div
+                id="last-updated"
+                class="last-updated"
+            >
+                Last updated: --
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="/static/js/sidebar.js?v=2"></script>
+<script src="/static/js/system.js?v=1"></script>
+  <link rel="stylesheet" href="/static/css/sidebar.css?v=1">
+
+</body>
+</html>

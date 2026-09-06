@@ -2,553 +2,556 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Firewall Dashboard</title>
 
     <link
         rel="stylesheet"
-        href="/static/css/dashboard.css"
+        href="/static/css/dashboard.css?v=4"
     >
-
 </head>
-
 
 <body>
 
-    <!-- ================================= -->
-    <!-- HEADER -->
-    <!-- ================================= -->
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
 
-    <header>
+    <aside class="sidebar">
+       
+        <nav class="sidebar-nav">
 
-        <h1>Firewall Dashboard</h1>
-
-        <span id="status">
-            Checking...
-        </span>
-
-    </header>
-
-
-    <!-- ================================= -->
-    <!-- MAIN DASHBOARD -->
-    <!-- ================================= -->
-
-    <main>
+            <a
+                href="/"
+                class="nav-item active"
+            >
+                <span class="nav-icon">⌂</span>
+                <span class="nav-label">Dashboard</span>
+            </a>
 
 
-        <!-- ================================= -->
-        <!-- DASHBOARD CARDS -->
-        <!-- ================================= -->
+            <a
+                href="/rules"
+                class="nav-item"
+            >
+                <span class="nav-icon">☷</span>
+                <span class="nav-label">Rules</span>
+            </a>
 
-        <section class="cards">
+
+            <a
+                href="/logs"
+                class="nav-item"
+            >
+                <span class="nav-icon">▣</span>
+                <span class="nav-label">Logs</span>
+            </a>
 
 
-            <div class="card">
+            <a
+                href="/traffic"
+                class="nav-item"
+            >
+                <span class="nav-icon">◫</span>
+                <span class="nav-label">Traffic</span>
+            </a>
 
-                <h3>
-                    Firewall
-                </h3>
 
-                <p id="firewall-status">
-                    Loading...
+            <a
+                href="/system"
+                class="nav-item"
+            >
+                <span class="nav-icon">▦</span>
+                <span class="nav-label">System</span>
+            </a>
+
+
+            <a
+                href="/ai"
+                class="nav-item"
+            >
+                <span class="nav-icon">✦</span>
+                <span class="nav-label">AI Assistant</span>
+            </a>
+
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <button
+                type="button"
+                id="logout-button"
+                class="nav-item logout-button"
+            >
+                <span class="nav-icon">↪</span>
+                <span class="nav-label">Logout</span>
+            </button>
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+        TOP BAR
+        ================================================= -->
+
+        <header class="topbar">
+
+            <div class="brand">
+                
+            
+                <div class="brand-icon">
+                    🦉
+                </div>
+
+                <div class="brand-text">
+
+                    <h1>VesperAegis</h1>
+
+                    <span>
+                        Adaptive Network Security & Traffic Intelligence
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="header-controls">
+
+                <span
+                    id="status"
+                    class="firewall-status"
+                >
+                    Checking...
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             FIREWALL OVERVIEW
+             ================================================= -->
+
+        <section class="dashboard-toolbar">
+
+            <div>
+
+                <h2 class="page-title">
+                    Firewall Overview
+                </h2>
+
+                <p id="last-updated">
+                    Last updated: --
                 </p>
 
             </div>
 
 
-            <div class="card">
-
-                <h3>
-                    Rules
-                </h3>
-
-                <p id="rule-count">
-                    Loading...
-                </p>
-
-            </div>
-
-
-            <div class="card">
-
-                <h3>
-                    Packets
-                </h3>
-
-                <p id="packet-count">
-                    Loading...
-                </p>
-
-            </div>
-
-
-            <div class="card">
-
-                <h3>
-                    Bytes
-                </h3>
-
-                <p id="byte-count">
-                    Loading...
-                </p>
-
-            </div>
-
-        </section>
-
-        <section class="cards">
-
-            <div class="card">
-                <h3>Accepted</h3>
-                <p id="accepted-count">0</p>
-            </div>
-
-            <div class="card">
-                <h3>Dropped</h3>
-                <p id="dropped-count">0</p>
-            </div>
-
-            <div class="card">
-                <h3>TCP Packets</h3>
-                 <p id="tcp-count">0</p>
-            </div>
-
-            <div class="card">
-                <h3>UDP Packets</h3>
-                <p id="udp-count">0</p>
-            </div>
-        </section>
-
-
-        <!-- ================================= -->
-        <!-- FIREWALL RULES -->
-        <!-- ================================= -->
-
-        <section class="panel">
-
-            <h2>
-                Rules
-            </h2>
-
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>ID</th>
-
-                        <th>Name</th>
-
-                        <th>Action</th>
-
-                        <th>Protocol</th>
-
-                        <th>Source</th>
-
-                        <th>Destination</th>
-
-                        <th>Status</th>
-
-                        <th>Packet</th>
-
-                        <th>Byte</th>
-
-                        <th>Controls</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody id="rules-table">
-
-                    <tr>
-
-                        <td colspan="10">
-                            Loading...
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </section>
-
-<!-- ================================= -->
-<!-- TRAFFIC ANALYTICS -->
-<!-- ================================= -->
-
-<section class="panel">
-
-    <h2>Traffic Analytics</h2>
-
-    <h3>Protocol Statistics</h3>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Protocol</th>
-                <th>Packets</th>
-                <th>Bytes</th>
-            </tr>
-        </thead>
-
-        <tbody id="protocol-table">
-            <tr>
-                <td colspan="3">Loading...</td>
-            </tr>
-        </tbody>
-    </table>
-
-
-    <h3>Top Source IPs</h3>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Source IP</th>
-                <th>Packets</th>
-                <th>Bytes</th>
-            </tr>
-        </thead>
-
-        <tbody id="source-ip-table">
-            <tr>
-                <td colspan="3">Loading...</td>
-            </tr>
-        </tbody>
-    </table>
-
-
-    <h3>Top Destination IPs</h3>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Destination IP</th>
-                <th>Packets</th>
-                <th>Bytes</th>
-            </tr>
-        </thead>
-
-        <tbody id="destination-ip-table">
-            <tr>
-                <td colspan="3">Loading...</td>
-            </tr>
-        </tbody>
-    </table>
-
-
-    <h3>Top Source Ports</h3>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Source Port</th>
-                <th>Packets</th>
-                <th>Bytes</th>
-            </tr>
-        </thead>
-
-        <tbody id="source-port-table">
-            <tr>
-                <td colspan="3">Loading...</td>
-            </tr>
-        </tbody>
-    </table>
-
-
-    <h3>Top Destination Ports</h3>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Destination Port</th>
-                <th>Packets</th>
-                <th>Bytes</th>
-            </tr>
-        </thead>
-
-        <tbody id="destination-port-table">
-            <tr>
-                <td colspan="3">Loading...</td>
-            </tr>
-        </tbody>
-    </table>
-
-</section>
-<h3>Rule Analytics</h3>
-
-<table>
-    <thead>
-        <tr>
-            <th>Rule</th>
-            <th>Action</th>
-            <th>Packets</th>
-            <th>Bytes</th>
-        </tr>
-    </thead>
-
-    <tbody id="rule-statistics-table">
-        <tr>
-            <td colspan="4">Loading...</td>
-        </tr>
-    </tbody>
-</table>
-
-
-<h3>Zero-Hit Rules</h3>
-
-<table>
-    <thead>
-        <tr>
-            <th>Rule</th>
-            <th>Action</th>
-            <th>Packets</th>
-            <th>Bytes</th>
-        </tr>
-    </thead>
-
-    <tbody id="zero-hit-rule-table">
-        <tr>
-            <td colspan="4">Loading...</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Traffic by Hour</h3>
-
-<table>
-    <thead>
-        <tr>
-            <th>Hour</th>
-            <th>Packets</th>
-            <th>Bytes</th>
-            <th>Allowed</th>
-            <th>Dropped</th>
-        </tr>
-    </thead>
-
-    <tbody id="time-statistics-table">
-        <tr>
-            <td colspan="5">Loading...</td>
-        </tr>
-    </tbody>
-</table>
-
-        <!-- ================================= -->
-        <!-- ADD FIREWALL RULE -->
-        <!-- ================================= -->
-
-        <section class="panel">
-
-            <h2>
-                Add Firewall Rule
-            </h2>
-
-
-            <form id="rule-form">
-
-
-                <!-- RULE NAME -->
-
-                <input
-                    type="text"
-                    id="name"
-                    placeholder="Rule name"
-                    required
+            <div class="time-range">
+
+                <button
+                    class="time-range-button active"
+                    data-range="1h"
+                    type="button"
                 >
-
-
-                <!-- ACTION -->
-
-                <select id="action">
-
-                    <option value="allow">
-                        Allow
-                    </option>
-
-                    <option value="deny">
-                        Deny
-                    </option>
-
-                </select>
-
-
-                <!-- PROTOCOL -->
-
-                <select id="protocol">
-
-                    <option value="">
-                        Any Protocol
-                    </option>
-
-                    <option value="tcp">
-                        TCP
-                    </option>
-
-                    <option value="udp">
-                        UDP
-                    </option>
-
-                    <option value="icmp">
-                        ICMP
-                    </option>
-
-                </select>
-
-
-                <!-- SOURCE IP -->
-
-                <input
-                    type="text"
-                    id="source_ip"
-                    placeholder="Source IP (optional)"
-                >
-
-
-                <!-- DESTINATION IP -->
-
-                <input
-                    type="text"
-                    id="destination_ip"
-                    placeholder="Destination IP (optional)"
-                >
-
-
-                <!-- SOURCE PORT -->
-
-                <input
-                    type="number"
-                    id="source_port"
-                    placeholder="Source Port (optional)"
-                >
-
-
-                <!-- DESTINATION PORT -->
-
-                <input
-                    type="number"
-                    id="destination_port"
-                    placeholder="Destination Port (optional)"
-                >
-
-
-                <!-- SUBMIT -->
-
-                <button type="submit">
-                    Add Rule
+                    Last 1 Hour
                 </button>
 
 
-            </form>
+                <button
+                    class="time-range-button"
+                    data-range="24h"
+                    type="button"
+                >
+                    Last 24 Hours
+                </button>
 
 
-            <!-- API RESULT MESSAGE -->
+                <button
+                    class="time-range-button"
+                    data-range="7d"
+                    type="button"
+                >
+                    Past Week
+                </button>
 
-            <p id="rule-message"></p>
-        <section
-    class="panel"
-    id="edit-rule-panel"
-    style="display: none;"
->
-    <h2>Edit Firewall Rule</h2>
 
-    <form id="edit-rule-form">
+                <button
+                    class="time-range-button"
+                    data-range="30d"
+                    type="button"
+                >
+                    Past 1 Month
+                </button>
 
-        <input
-            type="hidden"
-            id="edit-rule-id"
-        >
 
-        <input
-            type="text"
-            id="edit-name"
-            placeholder="Rule name"
-            required
-        >
+                <button
+                    id="refresh-button"
+                    class="refresh-button"
+                    type="button"
+                >
+                    Refresh
+                </button>
 
-        <select id="edit-action">
-            <option value="allow">Allow</option>
-            <option value="deny">Deny</option>
-        </select>
+            </div>
 
-        <select id="edit-protocol">
-            <option value="any">Any Protocol</option>
-            <option value="tcp">TCP</option>
-            <option value="udp">UDP</option>
-            <option value="icmp">ICMP</option>
-        </select>
+        </section>
 
-        <input
-            type="text"
-            id="edit-source-ip"
-            placeholder="Source IP (optional)"
-        >
 
-        <input
-            type="text"
-            id="edit-destination-ip"
-            placeholder="Destination IP (optional)"
-        >
+        <!-- =================================================
+             SUMMARY CARDS
+             ================================================= -->
 
-        <input
-            type="number"
-            id="edit-source-port"
-            placeholder="Source Port (optional)"
-        >
+        <section class="summary-grid">
 
-        <input
-            type="number"
-            id="edit-destination-port"
-            placeholder="Destination Port (optional)"
-        >
 
-        <label>
-            <input
-                type="checkbox"
-                id="edit-enabled"
-            >
-            Enabled
-        </label>
+            <div class="summary-card panel">
 
-        <button type="submit">
-            Save Changes
-        </button>
+                <span class="summary-label">
+                    Total Packets
+                </span>
 
-        <button
-            type="button"
-            id="cancel-edit"
-        >
-            Cancel
-        </button>
+                <strong id="packet-count">
+                    0
+                </strong>
 
-    </form>
+            </div>
 
-    <p id="edit-message"></p>
-</section>
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Allowed
+                </span>
+
+                <strong id="accepted-count">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Blocked
+                </span>
+
+                <strong id="dropped-count">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Total Traffic
+                </span>
+
+                <strong id="byte-count">
+                    0 B
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             TRAFFIC + PROTOCOL
+             ================================================= -->
+
+        <section class="dashboard-grid">
+
+
+            <!-- Traffic Overview -->
+
+            <div class="panel traffic-panel">
+
+                <div class="traffic-header">
+
+                    <div>
+
+                        <h3>
+                            Traffic Overview
+                        </h3>
+
+                        <p>
+                            Firewall traffic for the selected period
+                        </p>
+
+                    </div>
+
+
+                    <span
+                        id="traffic-status"
+                        class="live-indicator"
+                    >
+                        Live
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="traffic-chart"
+                    class="traffic-chart"
+                >
+
+                    <div class="empty-state">
+                        No traffic data available.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Protocol Distribution -->
+
+            <div class="panel protocol-panel">
+
+                <div class="traffic-header">
+
+                    <div>
+
+                        <h3>
+                            Protocol Distribution
+                        </h3>
+
+                        <p>
+                            Observed network protocols
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="protocol-distribution"
+                    class="protocol-list"
+                >
+
+                    <div class="empty-state">
+                        No protocol data available.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             ACTIVE RULES
+             ================================================= -->
+
+        <section class="panel">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h3>
+                        Active Rules
+                    </h3>
+
+                    <p>
+                        Currently enabled firewall rules
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="view-all-rules"
+                    class="view-all"
+                    type="button"
+                >
+                    View All →
+                </button>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="dashboard-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Rule
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                            <th>
+                                Protocol
+                            </th>
+
+                            <th>
+                                Source
+                            </th>
+
+                            <th>
+                                Destination
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="rules-table">
+
+                        <tr>
+
+                            <td colspan="6">
+                                Loading...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+        RECENT SECURITY EVENTS
+        ================================================= -->
+
+        <section class="panel">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h3>
+                        Recent Security Events
+                    </h3>
+
+                    <p>
+                        Latest firewall activity
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="view-all-logs"
+                    class="view-all"
+                    type="button"
+                >
+                    View All →
+                </button>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="dashboard-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Time
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                            <th>
+                                Protocol
+                            </th>
+
+                            <th>
+                                Source
+                            </th>
+
+                            <th>
+                                Destination
+                            </th>
+
+                            <th>
+                                Rule
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="events-table">
+
+                        <tr>
+
+                            <td colspan="6">
+                                Loading...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </section>
 
 
     </main>
 
 
-    <!-- ================================= -->
-    <!-- DASHBOARD JAVASCRIPT -->
-    <!-- ================================= -->
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
 
-    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/sidebar.js?v=2"></script>
+
+    <script src="/static/js/dashboard.js?v=7"></script>
+
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=1">
 
 
 </body>

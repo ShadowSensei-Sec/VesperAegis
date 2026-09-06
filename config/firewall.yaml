@@ -1,44 +1,32 @@
 firewall:
-  name: "Firewall Project"
-  enabled: true
-
-  default_policy:
-    input: accept
-    output: accept
-    forward: drop
-
+  name: VesperAegis Firewall
+  enabled: false
+  interfaces:
+    wan: enp0s3
+    lan: enp0s8
+    protected: enp0s9
 rules:
-
-  - id: 1001
-    name: "Block Telnet"
-    action: "deny"
-    protocol: "tcp"
-    priority: 10
-
-    source:
-      ip: "any"
-
-    destination:
-      ip: "any"
-      port: 23
-
-    enabled: true
-
-    description: "Block TCP traffic to Telnet port 23"
-
-  - id: 1002
-    name: "Allow HTTPS"
-    action: "allow"
-    protocol: "tcp"
-    priority: 20
-
-    source:
-      ip: "any"
-
-    destination:
-      ip: "any"
-      port: 443
-
-    enabled: true
-
-    description: "Allow HTTPS traffic"
+- id: 1001
+  name: Block Telnet
+  action: deny
+  protocol: tcp
+  priority: 10
+  source:
+    ip: any
+  destination:
+    ip: any
+    port: 23
+  enabled: true
+  description: Block TCP traffic to Telnet port 23
+- id: 1002
+  name: Allow HTTPS
+  action: allow
+  protocol: tcp
+  priority: 20
+  source:
+    ip: any
+  destination:
+    ip: any
+    port: 443
+  enabled: true
+  description: Allow HTTPS traffic

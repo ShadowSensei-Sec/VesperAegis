@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel
+from typing import Optional
 
 from app.firewall.rule_conflict import RuleConflictDetector
 from app.firewall.nftables import NftablesManager
@@ -7,6 +8,15 @@ from app.firewall.rule_parser import FirewallRule
 from app.logging.logger import FirewallLogger
 from app.traffic.statistics import TrafficStatistics
 from app.firewall.rule_warnings import RuleWarningAnalyzer
+from app.system.system_info import SystemInfo
+
+from app.auth import initialize_admin_credentials
+from app.auth_service import (
+    login,
+    validate_session,
+    destroy_session,
+    update_credentials,
+)
 
 from app.database.database import (
     create_firewall_rule,
@@ -15,6 +25,7 @@ from app.database.database import (
     update_firewall_rule_handle,
     set_firewall_rule_enabled,
     delete_firewall_rule,
+    reset_firewall_data,
 )
 
 router = APIRouter()
@@ -25,6 +36,106 @@ statistics = TrafficStatistics()
 conflict_detector = RuleConflictDetector()
 warning_analyzer = RuleWarningAnalyzer()
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class ChangeCredentialsRequest(BaseModel):
+    username: str
+    password: str
+
+@router.post("/auth/login")
+def auth_login(credentials: LoginRequest, response: Response):
+
+    initialize_admin_credentials()
+
+    result = login(
+        username=credentials.username,
+        password=credentials.password,
+    )
+
+    if result is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid username or password.",
+        )
+
+    response.set_cookie(
+        key="vesper_session",
+        value=result["token"],
+        httponly=True,
+        samesite="strict",
+        secure=False,
+        max_age=3600,
+    )
+
+    return {
+        "success": True,
+        "must_change_password":
+            result["must_change_password"],
+    }
+
+
+@router.post("/auth/change-credentials")
+def auth_change_credentials(
+    credentials: ChangeCredentialsRequest,
+    request: Request,
+):
+
+    token = request.cookies.get("vesper_session")
+
+    if not validate_session(token):
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication required.",
+        )
+
+    try:
+
+        result = update_credentials(
+            current_token=token,
+            username=credentials.username,
+            password=credentials.password,
+        )
+
+        return result
+
+    except ValueError as error:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(error),
+        )
+
+
+@router.post("/auth/logout")
+def auth_logout(
+    request: Request,
+    response: Response,
+):
+
+    token = request.cookies.get("vesper_session")
+
+    destroy_session(token)
+
+    response.delete_cookie(
+        key="vesper_session"
+    )
+
+    return {
+        "success": True
+    }
+
+
+@router.get("/auth/status")
+def auth_status(request: Request):
+
+    token = request.cookies.get("vesper_session")
+
+    return {
+        "authenticated": validate_session(token)
+    }
 
 class FirewallRuleRequest(BaseModel):
     name: str
@@ -502,9 +613,6 @@ def edit_rule(rule_id: int, rule: FirewallRuleRequest):
         # -------------------------------------------------
         # 8. Remove old nftables rule
         # -------------------------------------------------
-                # -------------------------------------------------
-        # 8. Remove old nftables rule
-        # -------------------------------------------------
 
         if old_nft_handle is not None:
 
@@ -610,14 +718,40 @@ def firewall_logs(limit: int = 100):
 
 
 @router.get("/statistics")
-def firewall_statistics():
-    forward = statistics.get_forward_statistics()
+def firewall_statistics(range: str = "1h"):
+    valid_ranges = {"1h", "24h", "7d", "30d"}
+
+    if range not in valid_ranges:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid time range. Use 1h, 24h, 7d, or 30d.",
+        )
+
+    forward = statistics.get_forward_statistics(range)
 
     return {
         **forward,
-        "protocols": statistics.get_protocol_statistics(),
-        "ips": statistics.get_ip_statistics(),
-        "ports": statistics.get_port_statistics(),
-        "rule_statistics": statistics.get_rule_statistics(),
-        "time_statistics": statistics.get_time_statistics(),
+        "range": range,
+        "protocols": statistics.get_protocol_statistics(range),
+        "time_statistics": statistics.get_time_statistics(range),
     }
+
+@router.get("/system")
+def get_system_info():
+    system_info = SystemInfo.get_system_info()
+
+    system_info["network_interfaces"] = (
+        SystemInfo.get_network_interfaces()
+    )
+
+    system_info["services"] = (
+        SystemInfo.get_service_status()
+    )
+
+    system_info["configuration"] = {
+        "rules": SystemInfo.get_configuration_status(),
+        "default_policy": SystemInfo.get_default_policies(),
+    }
+
+    return system_info
+

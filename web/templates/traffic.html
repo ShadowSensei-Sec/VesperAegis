@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Traffic - Firewall Project</title>
+
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=4">
+</head>
+
+<body>
+
+    <aside class="sidebar">
+
+    <nav class="sidebar-nav">
+
+        <a href="/" class="nav-item">
+            <span class="nav-icon">⌂</span>
+            <span class="nav-label">Dashboard</span>
+        </a>
+
+        <a href="/rules" class="nav-item">
+            <span class="nav-icon">☷</span>
+            <span class="nav-label">Rules</span>
+        </a>
+
+        <a href="/logs" class="nav-item">
+            <span class="nav-icon">▣</span>
+            <span class="nav-label">Logs</span>
+        </a>
+
+        <a href="/traffic" class="nav-item">
+            <span class="nav-icon">◫</span>
+            <span class="nav-label">Traffic</span>
+        </a>
+
+        <a href="/system" class="nav-item">
+            <span class="nav-icon">▦</span>
+            <span class="nav-label">System</span>
+        </a>
+
+        <a href="/ai" class="nav-item">
+            <span class="nav-icon">✦</span>
+            <span class="nav-label">AI Assistant</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-footer">
+        <button
+            type="button"
+            id="logout-button"
+            class="nav-item logout-button"
+        >
+            <span class="nav-icon">↪</span>
+            <span class="nav-label">Logout</span>
+        </button>
+    </div>
+
+</aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    🦉
+                </div>
+
+                <div class="brand-text">
+                    <h1>VesperAegis</h1>
+                    <span>
+                        Adaptive Network Security & Traffic Intelligence
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="dashboard-toolbar">
+
+            <div>
+
+                <h2 class="page-title">
+                    Network traffic statistics
+                </h2>
+
+                <p id="last-updated">
+                    Network traffic statistics
+                </p>
+
+            </div>
+
+
+            <div class="time-range">
+
+                <button
+                    class="time-range-button active"
+                    data-range="1h"
+                    type="button"
+                >
+                    Last 1 Hour
+                </button>
+
+                <button
+                    class="time-range-button"
+                    data-range="24h"
+                    type="button"
+                >
+                    Last 24 Hours
+                </button>
+
+                <button
+                    class="time-range-button"
+                    data-range="7d"
+                    type="button"
+                >
+                    Past Week
+                </button>
+
+                <button
+                    class="time-range-button"
+                    data-range="30d"
+                    type="button"
+                >
+                    Past 1 Month
+                </button>
+
+                <button
+                    id="refresh-button"
+                    class="refresh-button"
+                    type="button"
+                >
+                    Refresh
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <section class="summary-grid">
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Total Packets
+                </span>
+
+                <strong id="packet-count">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Allowed
+                </span>
+
+                <strong id="accepted-count">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Blocked
+                </span>
+
+                <strong id="dropped-count">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card panel">
+
+                <span class="summary-label">
+                    Total Traffic
+                </span>
+
+                <strong id="byte-count">
+                    0 B
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <section class="dashboard-grid">
+
+            <div class="panel traffic-panel">
+
+                <div class="traffic-header">
+
+                    <div>
+
+                        <h3>
+                            Traffic Overview
+                        </h3>
+
+                        <p>
+                            Observed firewall traffic
+                        </p>
+
+                    </div>
+
+                    <span
+                        id="traffic-status"
+                        class="live-indicator"
+                    >
+                        Live
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="traffic-chart"
+                    class="traffic-chart"
+                >
+                    <div class="empty-state">
+                        Loading traffic...
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="panel protocol-panel">
+
+                <div class="traffic-header">
+
+                    <div>
+
+                        <h3>
+                            Protocol Distribution
+                        </h3>
+
+                        <p>
+                            Observed network protocols
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="protocol-distribution"
+                    class="protocol-list"
+                >
+                    <div class="empty-state">
+                        Loading protocols...
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <script src="/static/js/sidebar.js?v=2"></script>
+
+    <script src="/static/js/traffic.js?v=1"></script>
+  <link rel="stylesheet" href="/static/css/sidebar.css?v=1">
+</body>
+
+</html>

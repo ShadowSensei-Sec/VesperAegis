@@ -256,3 +256,135 @@ def update_firewall_rule(
 
     connection.commit()
     connection.close()
+
+def reset_firewall_data():
+    """
+    Reset persistent firewall data to factory state.
+
+    Removes configured firewall rules and historical events
+    while preserving the SQLite database and its schema.
+    """
+
+    connection = get_connection()
+
+    try:
+        connection.execute("DELETE FROM firewall_rules")
+        connection.execute("DELETE FROM firewall_events")
+
+        # Reset SQLite AUTOINCREMENT counters.
+        connection.execute(
+            """
+            DELETE FROM sqlite_sequence
+            WHERE name IN ('firewall_rules', 'firewall_events')
+            """
+        )
+
+        connection.commit()
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+def get_auth_credentials():
+    """
+    Return the single administrator authentication record.
+    """
+
+    connection = get_connection()
+
+    try:
+        row = connection.execute(
+            """
+            SELECT id, username, password_hash, must_change_password
+            FROM auth_credentials
+            WHERE id = 1
+            """
+        ).fetchone()
+
+        if row is None:
+            return None
+
+        return dict(row)
+
+    finally:
+        connection.close()
+
+
+def create_auth_credentials(
+    username,
+    password_hash,
+    must_change_password=True,
+):
+    """
+    Create the single administrator authentication record.
+    """
+
+    connection = get_connection()
+
+    try:
+        connection.execute(
+            """
+            INSERT INTO auth_credentials (
+                id,
+                username,
+                password_hash,
+                must_change_password
+            )
+            VALUES (1, ?, ?, ?)
+            """,
+            (
+                username,
+                password_hash,
+                int(must_change_password),
+            ),
+        )
+
+        connection.commit()
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+
+def update_auth_credentials(
+    username,
+    password_hash,
+    must_change_password=False,
+):
+    """
+    Update the single administrator authentication record.
+    """
+
+    connection = get_connection()
+
+    try:
+        connection.execute(
+            """
+            UPDATE auth_credentials
+            SET
+                username = ?,
+                password_hash = ?,
+                must_change_password = ?
+            WHERE id = 1
+            """,
+            (
+                username,
+                password_hash,
+                int(must_change_password),
+            ),
+        )
+
+        connection.commit()
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
