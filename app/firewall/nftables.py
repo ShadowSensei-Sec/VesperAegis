@@ -18,10 +18,10 @@ class NftablesManager:
     """
 
     TABLE_FAMILY = "inet"
-    TABLE_NAME = "firewall_project"
+    TABLE_NAME = "nftable"
 
     NAT_TABLE_FAMILY = "ip"
-    NAT_TABLE_NAME = "firewall_nat"
+    NAT_TABLE_NAME = "Nat"
 
     # =========================================================
     # COMMAND EXECUTION
