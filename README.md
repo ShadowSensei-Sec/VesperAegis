@@ -139,13 +139,13 @@ The application starts the firewall configuration, FastAPI backend, and configur
 Open:
 
 ```text
-http://<firewall-ip>:8000
+http://<firewall-ip>:8000/login
 ```
 
 For local access:
 
 ```text
-http://127.0.0.1:8000
+http://127.0.0.1:8000/login
 ```
 
 ---
