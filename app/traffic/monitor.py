@@ -1,5 +1,5 @@
 from app.firewall.packet_inspector import PacketInspector
-from app.firewall.policy_manager import PolicyManager
+from app.database.database import get_firewall_rules
 from app.firewall.rule_engine import RuleEngine
 from app.logging.event_service import FirewallEventService
 
@@ -12,13 +12,10 @@ class TrafficMonitor:
         self.inspector = PacketInspector(
             interface=interface
         )
-
         self.event_service = FirewallEventService()
 
-        self.policy_manager = PolicyManager()
-
         self.rule_engine = RuleEngine(
-            self.policy_manager.load_rules()
+            get_firewall_rules()
         )
 
     def process_packet(self, packet):

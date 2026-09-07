@@ -42,3 +42,8 @@ runtime/
 # SQLite runtime files
 *.db-wal
 *.db-shm
+
+# Backup files
+*.backup
+*.bak
+*.old

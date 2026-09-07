@@ -1,16 +1,41 @@
 from pathlib import Path
+import threading
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+
 from app.api import router
 from app.auth_service import validate_session
+from app.traffic.monitor import TrafficMonitor
+from app.firewall.policy_manager import PolicyManager
 
 app = FastAPI(
     title="API",
     version="0.1.0",
     description="REST API for the Linux",
 )
+def start_traffic_monitor():
+    policy_manager = PolicyManager()
+    interfaces = policy_manager.load_interfaces()
 
+    monitor_interface = interfaces.get("lan")
+
+    if not monitor_interface:
+        print("[!] Traffic monitor disabled: LAN interface not configured.")
+        return
+
+    monitor = TrafficMonitor(monitor_interface)
+    monitor.start()
+
+
+@app.on_event("startup")
+def startup_event():
+    monitor_thread = threading.Thread(
+        target=start_traffic_monitor,
+        daemon=True,
+    )
+    monitor_thread.start()
 
 app.include_router(router, prefix="/api")
 

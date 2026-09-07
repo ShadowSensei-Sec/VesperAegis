@@ -253,7 +253,15 @@ class NftablesManager:
         protocol = rule.protocol.lower()
 
         if protocol != "any":
-            expression.append(protocol)
+
+            if protocol == "icmp":
+                expression.extend(["ip", "protocol", "icmp"])
+
+            elif protocol == "icmpv6":
+                expression.extend(["ip6", "nexthdr", "icmpv6"])
+
+            else:
+                expression.append(protocol)
 
         # -----------------------------------------------------
         # Source Port
