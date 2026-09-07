@@ -1,4 +1,3 @@
-````markdown
 # VesperAegis
 
 > **A Linux-based firewall and network security platform for packet filtering, traffic monitoring, rule management, security-event logging, and firewall visibility.**
