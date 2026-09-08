@@ -260,6 +260,9 @@ class NftablesManager:
             elif protocol == "icmpv6":
                 expression.extend(["ip6", "nexthdr", "icmpv6"])
 
+            elif protocol in ("tcp", "udp"):
+               expression.extend(["ip", "protocol", protocol])
+
             else:
                 expression.append(protocol)
 
@@ -270,6 +273,7 @@ class NftablesManager:
         if rule.source_port is not None:
             expression.extend(
                 [
+                    protocol,
                     "sport",
                     str(rule.source_port),
                 ]
@@ -282,6 +286,7 @@ class NftablesManager:
         if rule.destination_port is not None:
             expression.extend(
                 [
+                    protocol,
                     "dport",
                     str(rule.destination_port),
                 ]
