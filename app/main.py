@@ -43,9 +43,7 @@ app.include_router(router, prefix="/api")
 async def authentication_middleware(request: Request, call_next):
     path = request.url.path
 
-    public_paths = {
-        "/login",
-    }
+    public_paths = {"/login", "/favicon.ico"}
 
     if path in public_paths or path.startswith("/static/"):
         return await call_next(request)

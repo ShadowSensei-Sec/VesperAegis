@@ -1,53 +1,12 @@
 from app.firewall.nftables import NftablesManager
-from app.firewall.rule_parser import RuleParser, FirewallRule
+from app.firewall.rule_parser import FirewallRule
 
 from app.database.database import (
     get_firewall_rules,
-    create_firewall_rule,
     update_firewall_rule_handle,
 )
 
 CONFIG_PATH = "config/firewall.yaml"
-
-def bootstrap_database_from_yaml():
-    print("\n[+] Bootstrapping database from YAML...")
-
-    parser = RuleParser(CONFIG_PATH)
-    yaml_rules = parser.parse_rules()
-
-    existing_rules = get_firewall_rules()
-
-    existing_names = {
-        rule["name"]
-        for rule in existing_rules
-    }
-
-    created = 0
-    skipped = 0
-
-    for rule in yaml_rules:
-
-        if rule.name in existing_names:
-            print(
-                f"Skipping existing rule: {rule.name}"
-            )
-            skipped += 1
-            continue
-
-        rule_id = create_firewall_rule(rule)
-
-        print(
-            f"Added default rule: "
-            f"{rule.name} "
-            f"(database ID {rule_id})"
-        )
-
-        created += 1
-
-    print(
-        f"[+] Bootstrap complete: "
-        f"{created} created, {skipped} skipped."
-    )
 
 def restore_database_rules(firewall):
     print("\n[+] Restoring rules from SQLite...")
