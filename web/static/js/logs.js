@@ -62,8 +62,13 @@ function parseEventDate(timestamp) {
         return null;
     }
 
-    const normalized =
+    let normalized =
         String(timestamp).replace(" ", "T");
+
+    // SQLite CURRENT_TIMESTAMP is UTC.
+    if (!normalized.endsWith("Z")) {
+        normalized += "Z";
+    }
 
     const date =
         new Date(normalized);
@@ -85,10 +90,20 @@ function formatTimestamp(timestamp) {
         return timestamp || "—";
     }
 
-    return date.toLocaleString();
+    return new Intl.DateTimeFormat(
+        "en-IN",
+        {
+            timeZone: "Asia/Kolkata",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        }
+    ).format(date);
 }
-
-
 /* ============================================================
    EVENT HELPERS
    ============================================================ */

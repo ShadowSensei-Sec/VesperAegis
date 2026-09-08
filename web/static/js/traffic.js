@@ -80,7 +80,15 @@ function renderTraffic(data) {
         return;
     }
 
-    const statistics = data.time_statistics || [];
+    const statistics =
+        Object.entries(data.time_statistics || {})
+            .map(([time, item]) => ({
+                time,
+                ...item
+            }))
+            .sort((a, b) =>
+                a.time.localeCompare(b.time)
+            );
 
     if (!statistics.length) {
 
@@ -96,14 +104,16 @@ function renderTraffic(data) {
     container.innerHTML = "";
 
     const maxPackets = Math.max(
-        ...statistics.map(item => item.packets || 0),
+        ...statistics.map(
+            item => item.packets || 0
+        ),
         1
     );
 
-
     statistics.forEach(item => {
 
-        const row = document.createElement("div");
+        const row =
+            document.createElement("div");
 
         row.className = "traffic-row";
 

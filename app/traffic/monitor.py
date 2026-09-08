@@ -1,3 +1,5 @@
+import time
+
 from app.firewall.packet_inspector import PacketInspector
 from app.database.database import get_firewall_rules
 from app.firewall.rule_engine import RuleEngine
@@ -12,13 +14,32 @@ class TrafficMonitor:
         self.inspector = PacketInspector(
             interface=interface
         )
+
         self.event_service = FirewallEventService()
 
         self.rule_engine = RuleEngine(
             get_firewall_rules()
         )
 
+        self.last_rule_refresh = time.monotonic()
+        self.rule_refresh_interval = 1.0
+
+    def refresh_rules(self):
+
+        now = time.monotonic()
+
+        if now - self.last_rule_refresh < self.rule_refresh_interval:
+            return
+
+        self.rule_engine.set_rules(
+            get_firewall_rules()
+        )
+
+        self.last_rule_refresh = now
+
     def process_packet(self, packet):
+
+        self.refresh_rules()
 
         metadata = self.inspector.inspect_packet(packet)
 
